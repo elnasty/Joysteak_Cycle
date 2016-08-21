@@ -1,0 +1,334 @@
+fileFormatVersion: 2
+guid: b667c959fab436e4db5b34e85c65d9be
+timeCreated: 1464683707
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: GirlSprite_0
+    21300002: GirlSprite_1
+    21300004: GirlSprite_2
+    21300006: GirlSprite_3
+    21300008: GirlSprite_4
+    21300010: GirlSprite_5
+    21300012: GirlSprite_6
+    21300014: GirlSprite_7
+    21300016: GirlSprite_8
+    21300018: GirlSprite_9
+    21300020: GirlSprite_10
+    21300022: GirlSprite_11
+    21300024: GirlSprite_12
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: GirlSprite_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 224
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -11, y: 16}
+        - {x: -13, y: 14}
+        - {x: -13, y: -14}
+        - {x: -11, y: -16}
+        - {x: 9, y: -16}
+        - {x: 16, y: -13}
+        - {x: 16, y: 16}
+    - name: GirlSprite_1
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 224
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -9, y: 16}
+        - {x: -14, y: 9}
+        - {x: -14, y: -12}
+        - {x: -10, y: -16}
+        - {x: 10, y: -16}
+        - {x: 15, y: -11}
+        - {x: 15, y: 14}
+        - {x: 11, y: 16}
+    - name: GirlSprite_2
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 224
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 14, y: 16}
+        - {x: -10, y: 16}
+        - {x: -14, y: 15}
+        - {x: -15, y: 3}
+        - {x: -15, y: -12}
+        - {x: -12, y: -16}
+        - {x: 10, y: -16}
+        - {x: 15, y: -11}
+        - {x: 15, y: 15}
+    - name: GirlSprite_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 192
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 9, y: 16}
+        - {x: -14, y: 16}
+        - {x: -14, y: -1}
+        - {x: -13, y: -4}
+        - {x: -7, y: -16}
+        - {x: 8, y: -16}
+        - {x: 16, y: -9}
+        - {x: 16, y: -1}
+        - {x: 13, y: 13}
+    - name: GirlSprite_4
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 192
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 11, y: 16}
+        - {x: -14, y: 16}
+        - {x: -14, y: -3}
+        - {x: -13, y: -15}
+        - {x: -10, y: -16}
+        - {x: 10, y: -16}
+        - {x: 14, y: -11}
+        - {x: 14, y: 5}
+        - {x: 13, y: 14}
+    - name: GirlSprite_5
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 192
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -14, y: 16}
+        - {x: -14, y: 1}
+        - {x: -10, y: -16}
+        - {x: 11, y: -16}
+        - {x: 13, y: -11}
+        - {x: 13, y: 9}
+        - {x: 10, y: 16}
+    - name: GirlSprite_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 160
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -9, y: 16}
+        - {x: -16, y: 6}
+        - {x: -16, y: -9}
+        - {x: -13, y: -16}
+        - {x: 9, y: -16}
+        - {x: 13, y: -15}
+        - {x: 13, y: 13}
+        - {x: 10, y: 16}
+    - name: GirlSprite_7
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 160
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -13, y: 16}
+        - {x: -14, y: 14}
+        - {x: -14, y: -12}
+        - {x: -12, y: -16}
+        - {x: 8, y: -16}
+        - {x: 13, y: -3}
+        - {x: 13, y: 16}
+    - name: GirlSprite_8
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 160
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 11, y: 16}
+        - {x: -10, y: 16}
+        - {x: -13, y: 14}
+        - {x: -13, y: -10}
+        - {x: -11, y: -16}
+        - {x: 9, y: -16}
+        - {x: 11, y: -12}
+        - {x: 13, y: 7}
+        - {x: 13, y: 13}
+    - name: GirlSprite_9
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 128
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -12, y: 16}
+        - {x: -13, y: 15}
+        - {x: -15, y: 8}
+        - {x: -15, y: -9}
+        - {x: -8, y: -16}
+        - {x: 11, y: -16}
+        - {x: 14, y: -11}
+        - {x: 14, y: 14}
+        - {x: 10, y: 16}
+    - name: GirlSprite_10
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 128
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -14, y: 16}
+        - {x: -14, y: -15}
+        - {x: -13, y: -16}
+        - {x: 12, y: -16}
+        - {x: 15, y: -15}
+        - {x: 15, y: 14}
+        - {x: 11, y: 16}
+    - name: GirlSprite_11
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 128
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 9, y: 16}
+        - {x: -14, y: 16}
+        - {x: -14, y: -15}
+        - {x: -10, y: -16}
+        - {x: 12, y: -16}
+        - {x: 15, y: -12}
+        - {x: 15, y: 3}
+        - {x: 14, y: 13}
+    - name: GirlSprite_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 108
+        width: 142
+        height: 148
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -71, y: 74}
+        - {x: -71, y: -56}
+        - {x: -40, y: -56}
+        - {x: -39, y: -55}
+        - {x: -39, y: 74}
+      - - {x: -37, y: 74}
+        - {x: -37, y: -56}
+        - {x: -13, y: -56}
+        - {x: -8, y: -54}
+        - {x: -8, y: 72}
+        - {x: -10, y: 74}
+      - - {x: -1, y: 74}
+        - {x: -6, y: 62}
+        - {x: -6, y: 49}
+        - {x: -2, y: 44}
+        - {x: 2, y: 42}
+        - {x: 2, y: 43}
+        - {x: 0, y: 42}
+        - {x: -6, y: 40}
+        - {x: -6, y: -50}
+        - {x: 0, y: -56}
+        - {x: 17, y: -56}
+        - {x: 24, y: -53}
+        - {x: 24, y: 74}
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
