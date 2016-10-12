@@ -20,17 +20,17 @@ public class LevelBehavior : MonoBehaviour
         transform.GetComponent<Rigidbody2D>().velocity = Direction * speed;
 
         if (Input.GetKeyDown(KeyCode.R))
-            StartCoroutine(Rotate(15));
+            StartCoroutine(Rotate(15,10));
 	}
 
-    private IEnumerator Rotate(int degrees)
+    private IEnumerator Rotate(int degrees , float rotateSpeed)
     {
         degreesLeft = (int)(transform.rotation.z) / degrees;
 
         while (degreesLeft != 1)
         {
             print(degreesLeft);
-            transform.Rotate(Vector3.forward, speed * Time.deltaTime);
+            transform.Rotate(Vector3.forward, rotateSpeed * Time.deltaTime);
             degreesLeft = (int)(transform.rotation.z) / degrees;
             yield return null;
         }

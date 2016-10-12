@@ -13,6 +13,11 @@ public class PlayerAnimation : MonoBehaviour {
         movey = Input.GetAxisRaw("Horizontal");
         movex = Input.GetAxisRaw("Vertical");
 
+        if(Input.GetKeyDown(KeyCode.F))
+        {
+            movey = -0.01f;
+        }
+
         // 1 = down, 2 = up, 3 = right, 4 = left
         if (movex > 0 && movey == 0)
         {
