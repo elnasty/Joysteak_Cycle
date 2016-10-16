@@ -1,0 +1,18 @@
+{
+  "name": "Example",
+  "dialogueState": 0,
+  "dialogueLines": [
+    {
+      "text": "It's broken.",
+      "expression": 0
+    },
+    {
+      "description": "I don't want to deal with this right now.",
+      "expression": 2
+    },
+    {
+      "description": "No!",
+      "expression": 3
+    }
+  ]
+}

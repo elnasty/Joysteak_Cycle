@@ -7,6 +7,8 @@ public class PlayerAnimation : MonoBehaviour {
     private float movey;
     private float movex;
 
+    public GameObject Photo;
+
     // Update is called once per frame
     void Update()
     {
@@ -16,6 +18,12 @@ public class PlayerAnimation : MonoBehaviour {
         if(Input.GetKeyDown(KeyCode.F))
         {
             movey = -0.01f;
+            Invoke("Photos", 1f);
+        }
+
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            movex = 0.01f;
         }
 
         // 1 = down, 2 = up, 3 = right, 4 = left
@@ -39,5 +47,10 @@ public class PlayerAnimation : MonoBehaviour {
         {
             GetComponent<Animator>().SetInteger("Direction", 0);
         }
+    }
+
+    void Photos()
+    {
+        Photo.SetActive(true);
     }
 }
