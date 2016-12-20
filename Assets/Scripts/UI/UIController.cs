@@ -17,8 +17,8 @@ public class UIController : MonoBehaviour {
 	public enum Expression { Neutral, Happy, Sad, Angry, Surprised };
 
 	private bool isShowingDialogueBox = false;
-	private bool isMovingDialogueBox = false;
 	private bool isTypingDialogue = false;
+	private bool isMovingDialogueBox = false;
 	private bool isCurrentDialogueCollectionCompleted = true;
 
 	private DialogueCollection currentDialogCollection;
@@ -56,46 +56,49 @@ public class UIController : MonoBehaviour {
 	{
 		if (Input.GetKeyDown(KeyCode.Z))
 		{	
-			if (!isMovingDialogueBox && !isTypingDialogue && isCurrentDialogueCollectionCompleted)
-			{
-				MoveDialogueBox ();
-			}
-
 			if (isShowingDialogueBox)
 			{
 				if (isTypingDialogue) 
 				{
 					FastCompleteDialogue ();
-				}
-				else 
+				} 
+				else
 				{
 					ShowNextDialogueInCurrentCollection ();
 					if (isCurrentDialogueCollectionCompleted)
+					{
 						MoveDialogueBox ();
+					}
 				}
-			} 
-
+			}
+			else
+			{
+				MoveDialogueBox ();
+				ShowNextDialogueInCurrentCollection ();
+			}
 		}
 	}
 
 
 	void MoveDialogueBox() {
-		if (isShowingDialogueBox) //hide dialogue box
+		if (!isMovingDialogueBox)
 		{
-			Vector3 targetPos = m_dialogueBox.transform.position - new Vector3 (0, 3, 0);
-			StartCoroutine(MoveDialogueBox(targetPos));
-			isShowingDialogueBox = false;
-			m_dialogueText.GetComponent<Text>().text = "";
-			isCurrentDialogueCollectionCompleted = true;
-		} 
-		else //show dialogue box
-		{
-			Vector3 targetPos = m_dialogueBox.transform.position + new Vector3 (0, 3, 0);
-			StartCoroutine(MoveDialogueBox(targetPos));
-			isShowingDialogueBox = true;
-			isCurrentDialogueCollectionCompleted = false;
-		}	
-		Debug.Log (isCurrentDialogueCollectionCompleted);
+			if (isShowingDialogueBox) 
+			{ //hide dialogue box
+				Vector3 targetPos = m_dialogueBox.transform.position - new Vector3 (0, 3, 0);
+				StartCoroutine (MoveDialogueBox (targetPos));
+				isShowingDialogueBox = false;
+				isCurrentDialogueCollectionCompleted = true;
+				m_dialogueText.GetComponent<Text> ().text = "";
+			}
+			else
+			{ //show dialogue box
+				Vector3 targetPos = m_dialogueBox.transform.position + new Vector3 (0, 3, 0);
+				StartCoroutine (MoveDialogueBox (targetPos));
+				isShowingDialogueBox = true;
+				isCurrentDialogueCollectionCompleted = false;
+			}	
+		}
 	}
 
 		
