@@ -16,9 +16,11 @@ public class UIController : MonoBehaviour {
 	public AudioClip typeSound2;
 	public enum Expression { Neutral, Happy, Sad, Angry, Surprised };
 
-	private bool isShowingDialogueBox;
-	private bool isMovingDialogueBox;
-	private bool isTypingDialogue;
+	private bool isShowingDialogueBox = false;
+	private bool isMovingDialogueBox = false;
+	private bool isTypingDialogue = false;
+	private bool isCurrentDialogueCollectionCompleted = true;
+
 	private DialogueCollection currentDialogCollection;
 	private Dictionary<string,DialogueCollection> dialogueCatalog = new Dictionary<string,DialogueCollection>();
 
@@ -29,7 +31,7 @@ public class UIController : MonoBehaviour {
 		currentDialogCollection = dialogueCatalog ["Event1"];
 	}
 
-
+	//TODO: This function should not be in the UIController
 	void getDialogueData() {
 		var dialogueCatalogData = JSON.Parse(dialogueJSON.ToString());
 		foreach (string eventName in dialogueCatalogData.Keys)
@@ -53,23 +55,25 @@ public class UIController : MonoBehaviour {
 	void Update()
 	{
 		if (Input.GetKeyDown(KeyCode.Z))
-		{
-			if (!isMovingDialogueBox && !isTypingDialogue)
+		{	
+			if (!isMovingDialogueBox && !isTypingDialogue && isCurrentDialogueCollectionCompleted)
 			{
 				MoveDialogueBox ();
 			}
-			
-			if (isShowingDialogueBox) 
+
+			if (isShowingDialogueBox)
 			{
 				if (isTypingDialogue) 
 				{
 					FastCompleteDialogue ();
-				} 
+				}
 				else 
 				{
-					ShowNextDialogue ();
+					ShowNextDialogueInCurrentCollection ();
+					if (isCurrentDialogueCollectionCompleted)
+						MoveDialogueBox ();
 				}
-			}
+			} 
 
 		}
 	}
@@ -82,23 +86,33 @@ public class UIController : MonoBehaviour {
 			StartCoroutine(MoveDialogueBox(targetPos));
 			isShowingDialogueBox = false;
 			m_dialogueText.GetComponent<Text>().text = "";
+			isCurrentDialogueCollectionCompleted = true;
 		} 
 		else //show dialogue box
 		{
 			Vector3 targetPos = m_dialogueBox.transform.position + new Vector3 (0, 3, 0);
 			StartCoroutine(MoveDialogueBox(targetPos));
 			isShowingDialogueBox = true;
+			isCurrentDialogueCollectionCompleted = false;
 		}	
+		Debug.Log (isCurrentDialogueCollectionCompleted);
 	}
 
 		
-	void ShowNextDialogue()
+	void ShowNextDialogueInCurrentCollection()
 	{
 		m_dialogueText.GetComponent<Text>().text = "";
 		int currentIndex = currentDialogCollection.CurrentIndex;
 		List<Dialogue> dialogueList = currentDialogCollection.DialogueList;
-		string message = dialogueList[currentIndex].Text;
-		StartCoroutine(TypeText(message));
+		if (currentIndex < dialogueList.Count) 
+		{
+			string message = dialogueList [currentIndex].Text;
+			StartCoroutine (TypeText (message));
+		} 
+		else 
+		{
+			isCurrentDialogueCollectionCompleted = true;
+		}
 	}
 
 
