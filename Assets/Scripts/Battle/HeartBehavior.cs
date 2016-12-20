@@ -25,7 +25,7 @@ public class HeartBehavior : MonoBehaviour
     {
         if (darkening < darkeningMax)
         {
-            darkening += 5;
+            darkening += 1;
             StartCoroutine(Beat(HeartBeat));
         }
         Debug.Log(darkening);
@@ -78,6 +78,8 @@ public class HeartBehavior : MonoBehaviour
             currentTime = Time.timeSinceLevelLoad - startTime;
             yield return new WaitForSeconds(0.15f);
         } while (currentTime <= 0.6f);
+		transform.GetComponent<Renderer>().enabled = true;
+		transform.GetChild(0).GetComponent<Renderer>().enabled = true;
     }
 
     // Coroutine for 2 things, Pulsing and Pulsing Light
