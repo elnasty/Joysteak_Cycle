@@ -9,27 +9,34 @@ public class PlayerMovement : MonoBehaviour {
 
     void Update()
     {
-        moveX = Input.GetAxisRaw("Horizontal");
-        moveY = Input.GetAxisRaw("Vertical");
-
-		if (!UIController.instance.isShowingDialogueBox) 
+		if (GameManager.instance.isMouseControl) 
 		{
-			if (moveY != 0 && moveX == 0) 
+			Debug.Log ("mouse control");
+		}
+		else 
+		{
+			moveX = Input.GetAxisRaw ("Horizontal");
+			moveY = Input.GetAxisRaw ("Vertical");
+
+			if (!UIController.instance.isShowingDialogueBox) 
 			{
-				GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, moveY * movespeed);
-			}
-			else if (moveX != 0 && moveY == 0) 
-			{
-				GetComponent<Rigidbody2D> ().velocity = new Vector2 (moveX * movespeed, 0);     
-			}
-			else
+				if (moveY != 0 && moveX == 0) 
+				{
+					GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, moveY * movespeed);
+				}
+				else if (moveX != 0 && moveY == 0) 
+				{
+					GetComponent<Rigidbody2D> ().velocity = new Vector2 (moveX * movespeed, 0);     
+				}
+				else 
+				{
+					GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, 0);
+				}
+			} 
+			else 
 			{
 				GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, 0);
 			}
-		}
-		else
-		{
-			GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, 0);
 		}
     }
 }
