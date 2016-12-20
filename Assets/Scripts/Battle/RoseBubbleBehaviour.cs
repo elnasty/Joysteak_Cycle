@@ -6,6 +6,8 @@ public class RoseBubbleBehaviour : MonoBehaviour {
 
 	public GameObject playerObj;
 	public float triggerRadius;
+	public float timerTriggerValue;
+	float timer;
 
 	// Use this for initialization
 	void Start () {
@@ -16,7 +18,12 @@ public class RoseBubbleBehaviour : MonoBehaviour {
 	void Update () {
 		float distance = (transform.position - playerObj.transform.position).magnitude;
 		if (distance <= triggerRadius) {
-			Debug.Log ("Rose bud activated");
+			timer += Time.deltaTime;
+			if (timer >= timerTriggerValue) {
+				Debug.Log ("Rose bud activated");
+			}
+		} else {
+			timer = 0; //reset timer if no longer within range
 		}
 	}
 }
