@@ -25,7 +25,7 @@ public class HeartBehavior : MonoBehaviour
     {
         if (darkening < darkeningMax)
         {
-            darkening += 5;
+            darkening += 1;
             StartCoroutine(Beat(HeartBeat));
         }
         Debug.Log(darkening);
