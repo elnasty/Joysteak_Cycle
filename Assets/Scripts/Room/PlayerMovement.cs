@@ -3,35 +3,34 @@ using System.Collections;
 
 public class PlayerMovement : MonoBehaviour {
 
-    //Variables
     public float movespeed;
-    private float movey;
-    private float movex;
+    private float moveY;
+    private float moveX;
 
     void Update()
     {
-        movey = Input.GetAxisRaw("Horizontal");
-        movex = Input.GetAxisRaw("Vertical");
-    }
-    
-    
-    
-    // Update is called once per frame
-    void FixedUpdate()
-    {
+        moveX = Input.GetAxisRaw("Horizontal");
+        moveY = Input.GetAxisRaw("Vertical");
 
-        if (movex != 0 && movey == 0)
-        {
-            GetComponent<Rigidbody2D>().velocity = new Vector2(0, movex * movespeed);
-        }
-        else if (movey != 0 && movex == 0)
-        {
-            GetComponent<Rigidbody2D>().velocity = new Vector2(movey * movespeed, 0);     
-        }
-        else
-        {
-            GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
-        }
+		if (!UIController.instance.isShowingDialogueBox) 
+		{
+			if (moveY != 0 && moveX == 0) 
+			{
+				GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, moveY * movespeed);
+			}
+			else if (moveX != 0 && moveY == 0) 
+			{
+				GetComponent<Rigidbody2D> ().velocity = new Vector2 (moveX * movespeed, 0);     
+			}
+			else
+			{
+				GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, 0);
+			}
+		}
+		else
+		{
+			GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, 0);
+		}
     }
 }
 
