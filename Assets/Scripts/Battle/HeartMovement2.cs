@@ -10,16 +10,42 @@ public class HeartMovement2 : MonoBehaviour
     public float speedMax;
     public float acceleration;
     private float deceleration;
+	public float knockback;
+	bool isKnockedBack = false;
+	Rigidbody2D rgbody;
 
     void Start()
     {
         deceleration = -acceleration * 5;
+		rgbody = GetComponent<Rigidbody2D> ();
     }
+
+	void OnCollisionEnter2D(Collision2D coll){
+		//bounce heart back in the opposite direction
+		//KnockedBack();
+	
+	}
+
+	void KnockedBack(){
+		//rgbody.velocity = -direction*speed;
+		speed = 0;
+		//isKnockedBack = true;
+
+		//Invoke ("EndKnockBack", 0.5f);
+	}
+
+	void EndKnockBack(){
+		isKnockedBack = false;
+	}
+
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (Input.GetMouseButton(0))
+		if (isKnockedBack) {
+			return;
+		}
+        if (Input.GetMouseButton(0) )
         {
             // If mouse is left clicked, get direction
             mousePosition = new Vector3(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
@@ -40,7 +66,10 @@ public class HeartMovement2 : MonoBehaviour
                 speed = 0;
         }
 
-        speed = Mathf.Clamp(speed, 0, speedMax);
-        GetComponent<Rigidbody2D>().MovePosition(GetComponent<Rigidbody2D>().position + speed * direction * Time.deltaTime);
+
+		speed = Mathf.Clamp (speed, 0, speedMax);
+		GetComponent<Rigidbody2D>().MovePosition(GetComponent<Rigidbody2D>().position + speed * direction * Time.deltaTime);
+
+		
     }
 }
