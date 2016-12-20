@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 public class UIController : MonoBehaviour {
 
+	public static UIController instance;
+
 	[Header("Dialogue UI")]
 	public float letterPause = 0.1f;
 	public float textboxspeed;
@@ -16,7 +18,7 @@ public class UIController : MonoBehaviour {
 	public AudioClip typeSound2;
 	public enum Expression { Neutral, Happy, Sad, Angry, Surprised };
 
-	private bool isShowingDialogueBox = false;
+	public bool isShowingDialogueBox = false;
 	private bool isTypingDialogue = false;
 	private bool isMovingDialogueBox = false;
 	private bool isCurrentDialogueCollectionCompleted = true;
@@ -27,8 +29,10 @@ public class UIController : MonoBehaviour {
 
 	void Awake()
 	{
+		if (instance == null) instance = this;
 		getDialogueData ();
 		currentDialogCollection = dialogueCatalog ["Event1"];
+
 	}
 
 	//TODO: This function should not be in the UIController
