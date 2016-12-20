@@ -7,6 +7,8 @@ public class RingVineMovement : MonoBehaviour {
 	//ringvine reads the path object children and goes to each one down the list
 	public GameObject pathObjParent;
 	public float speed;
+	bool canMoveToNext = false;
+	int index = 0;
 
 	List<GameObject> pathObjList = new List<GameObject>();
 	Rigidbody2D rgbody;
@@ -18,33 +20,37 @@ public class RingVineMovement : MonoBehaviour {
 		}
 
 		rgbody = GetComponent<Rigidbody2D> ();
-		
+
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		//go to each pathobj in sequence (for some reason it goes backwards, i.e 3 path objects, goes from 3,2,1 instead of 1,2,3)
-		for (int i = 0; i <pathObjList.Count; i++) {
-			StartCoroutine(MoveToPathObj (pathObjList [i]));
-		}
+		MoveToNextPathObj ();
+
 	}
 
 	IEnumerator FadeInAndStart(){
 		yield return null;
 	}
 
-	IEnumerator MoveToPathObj(GameObject currPathObj){
-		float distToPoint = ((transform.position - currPathObj.transform.position).magnitude);
-		Vector2 direction = currPathObj.transform.position - transform.position;
 
-		while (distToPoint > 0 ) {
-			distToPoint = ((transform.position - currPathObj.transform.position).magnitude);
-			direction = currPathObj.transform.position - transform.position;
-			rgbody.velocity = direction.normalized * speed;
+	void MoveToNextPathObj ()
+	{
+		GameObject pathObj = pathObjList [index];
+		float distToPoint = ((transform.position - pathObj.transform.position).magnitude);
+		Vector2 direction = pathObj.transform.position - transform.position;
+		if (distToPoint > 0) {
+			canMoveToNext = false;
+			distToPoint = ((transform.position - pathObj.transform.position).magnitude);
+			direction = pathObj.transform.position - transform.position;
+			transform.position = Vector2.MoveTowards (transform.position, pathObj.transform.position, speed * Time.deltaTime);
 			if (distToPoint <= 0.05f) {
-				break;
+				canMoveToNext = true;
 			}
-			yield return null;
+		}
+		if (canMoveToNext) {
+			index = (index + 1) % (pathObjList.Count);
+			pathObj = pathObjList [index];
 		}
 	}
 }

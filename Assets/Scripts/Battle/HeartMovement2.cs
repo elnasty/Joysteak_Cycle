@@ -26,17 +26,17 @@ public class HeartMovement2 : MonoBehaviour
 	
 	}
 
-	void KnockedBack(){
-		//rgbody.velocity = -direction*speed;
-		speed = 0;
-		//isKnockedBack = true;
+//	void KnockedBack(){
+//		rgbody.velocity = (-direction*knockback);
+//		speed = 0;
+//		isKnockedBack = true;
+//
+//		Invoke ("EndKnockBack", 0.5f);
+//	}
 
-		//Invoke ("EndKnockBack", 0.5f);
-	}
-
-	void EndKnockBack(){
-		isKnockedBack = false;
-	}
+//	void EndKnockBack(){
+//		isKnockedBack = false;
+//	}
 
 
     // Update is called once per frame
