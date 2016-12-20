@@ -4,19 +4,19 @@ using System.Collections.Generic;
 public class DialogueCollection {
 
 	private List<Dialogue> dialogueList = new List<Dialogue>();
-	private string name;
+	private string eventName;
 	private int currentIndex;
 
-	public DialogueCollection (List<Dialogue> dialogueList, string name)
+	public DialogueCollection (string eventName, List<Dialogue> dialogueList)
 	{
-		this.name = name;
+		this.eventName = eventName;
 		this.dialogueList = dialogueList;
 		this.currentIndex = 0;
 	}
 
 	public DialogueCollection ()
 	{
-		this.name = null;
+		this.eventName = null;
 		this.dialogueList = null;
 		this.currentIndex = 0;
 	}
@@ -27,10 +27,10 @@ public class DialogueCollection {
 		set { this.dialogueList = value; }
 	}
 
-	public string Name
+	public string EventName
 	{
-		get { return this.name; }
-		set { this.name = value; }
+		get { return this.eventName; }
+		set { this.eventName = value; }
 	}
 
 	public int CurrentIndex

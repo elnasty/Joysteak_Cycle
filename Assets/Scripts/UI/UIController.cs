@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SimpleJSON;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,19 +19,34 @@ public class UIController : MonoBehaviour {
 	private bool isShowingDialogueBox;
 	private bool isMovingDialogueBox;
 	private bool isTypingDialogue;
-
-	private DialogueCollection dialogueCollection;
+	private DialogueCollection currentDialogCollection;
+	private Dictionary<string,DialogueCollection> dialogueCatalog = new Dictionary<string,DialogueCollection>();
 
 
 	void Awake()
 	{
-		isShowingDialogueBox = false;
-		string dialogueName = "Test";
-		List<Dialogue> dialogueList = new List<Dialogue> ();
-		dialogueList.Add (new Dialogue("I wonder what Elliot would say...", 0));
-		dialogueList.Add (new Dialogue("I don't want to deal with this right now.", 2));
-		dialogueList.Add (new Dialogue("No!", 3));
-		dialogueCollection = new DialogueCollection (dialogueList, dialogueName);
+		getDialogueData ();
+		currentDialogCollection = dialogueCatalog ["Event1"];
+	}
+
+
+	void getDialogueData() {
+		var dialogueCatalogData = JSON.Parse(dialogueJSON.ToString());
+		foreach (string eventName in dialogueCatalogData.Keys)
+		{
+			var dialogueLinesData = dialogueCatalogData[eventName]["dialogueLines"];
+			List<Dialogue> dialogueLines = new List<Dialogue> ();
+			for (int i = 0; i < dialogueLinesData.Count; i++)
+			{
+				var dialogueData = dialogueLinesData [i];
+				string character = dialogueData ["character"].Value;
+				string text 	 = dialogueData ["dialogue"].Value;
+				int expression 	 = dialogueData ["expression"].AsInt;
+				dialogueLines.Add (new Dialogue (character, text, expression));
+			}
+			DialogueCollection dialogueCollection = new DialogueCollection (eventName, dialogueLines);
+			dialogueCatalog.Add (eventName, dialogueCollection);
+		}
 	}
 
 
@@ -39,14 +55,20 @@ public class UIController : MonoBehaviour {
 		if (Input.GetKeyDown(KeyCode.Z))
 		{
 			if (!isMovingDialogueBox && !isTypingDialogue)
+			{
 				MoveDialogueBox ();
+			}
 			
 			if (isShowingDialogueBox) 
 			{
-				if (isTypingDialogue)
+				if (isTypingDialogue) 
+				{
 					FastCompleteDialogue ();
-				else
+				} 
+				else 
+				{
 					ShowNextDialogue ();
+				}
 			}
 
 		}
@@ -73,8 +95,8 @@ public class UIController : MonoBehaviour {
 	void ShowNextDialogue()
 	{
 		m_dialogueText.GetComponent<Text>().text = "";
-		int currentIndex = dialogueCollection.CurrentIndex;
-		List<Dialogue> dialogueList = dialogueCollection.DialogueList;
+		int currentIndex = currentDialogCollection.CurrentIndex;
+		List<Dialogue> dialogueList = currentDialogCollection.DialogueList;
 		string message = dialogueList[currentIndex].Text;
 		StartCoroutine(TypeText(message));
 	}
@@ -82,10 +104,10 @@ public class UIController : MonoBehaviour {
 
 	void FastCompleteDialogue()
 	{
-		int currentIndex = dialogueCollection.CurrentIndex;
-		List<Dialogue> dialogueList = dialogueCollection.DialogueList;
+		int currentIndex = currentDialogCollection.CurrentIndex;
+		List<Dialogue> dialogueList = currentDialogCollection.DialogueList;
 		string message = dialogueList[currentIndex].Text;
-		if(currentIndex <= dialogueList.Count) dialogueCollection.CurrentIndex += 1;
+		if(currentIndex <= dialogueList.Count) currentDialogCollection.CurrentIndex += 1;
 		m_dialogueText.GetComponent<Text> ().text = message;
 		isTypingDialogue = false;
 	}
@@ -100,9 +122,9 @@ public class UIController : MonoBehaviour {
 			yield return new WaitForSeconds(letterPause);
 			if (!isTypingDialogue) yield break;
 		}
-		int currentIndex = dialogueCollection.CurrentIndex;
-		List<Dialogue> dialogueList = dialogueCollection.DialogueList;
-		if(currentIndex <= dialogueList.Count) dialogueCollection.CurrentIndex += 1;
+		int currentIndex = currentDialogCollection.CurrentIndex;
+		List<Dialogue> dialogueList = currentDialogCollection.DialogueList;
+		if(currentIndex <= dialogueList.Count) currentDialogCollection.CurrentIndex += 1;
 		isTypingDialogue = false;
 	}
 		

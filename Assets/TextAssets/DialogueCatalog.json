@@ -1,18 +1,40 @@
 {
-  "name": "Example",
-  "dialogueState": 0,
-  "dialogueLines": [
-    {
-      "text": "It's broken.",
-      "expression": 0
-    },
-    {
-      "description": "I don't want to deal with this right now.",
-      "expression": 2
-    },
-    {
-      "description": "No!",
-      "expression": 3
-    }
-  ]
+  "Event1":{
+    "dialogueLines": [
+      {
+        "character": "Casey",
+        "dialogue": "I wonder what Elliot would say...",
+        "expression": 0
+      },
+      {
+        "character": "Casey",
+        "dialogue": "I don't want to deal with this right now.",
+        "expression": 2
+      },
+      {
+        "character": "Casey",
+        "dialogue": "No!",
+        "expression": 3
+      }
+    ]
+  },
+  "Event2":{
+    "dialogueLines": [
+      {
+        "character": "Casey",
+        "dialogue": "It's broken.",
+        "expression": 0
+      },
+      {
+        "character": "Casey",
+        "dialogue": "I don't want to deal with this right now.",
+        "expression": 2
+      },
+      {
+        "character": "Casey",
+        "dialogue": "No!",
+        "expression": 3
+      }
+    ]
+  }
 }
