@@ -20,13 +20,16 @@ public class HeartMovement2 : MonoBehaviour
 		rgbody = GetComponent<Rigidbody2D> ();
     }
 
-	void OnCollisionEnter2D(Collision2D coll){
+	void OnCollisionEnter2D(Collision2D coll)
+	{
 		//bounce heart back in the opposite direction
 		//KnockedBack();
+		speed = 0;
 	
 	}
 
-//	void KnockedBack(){
+//	void KnockedBack()
+//	{
 //		rgbody.velocity = (-direction*knockback);
 //		speed = 0;
 //		isKnockedBack = true;
@@ -34,7 +37,8 @@ public class HeartMovement2 : MonoBehaviour
 //		Invoke ("EndKnockBack", 0.5f);
 //	}
 
-//	void EndKnockBack(){
+//	void EndKnockBack()
+//	{
 //		isKnockedBack = false;
 //	}
 

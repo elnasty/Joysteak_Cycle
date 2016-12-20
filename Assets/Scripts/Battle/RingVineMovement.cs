@@ -14,8 +14,10 @@ public class RingVineMovement : MonoBehaviour {
 	Rigidbody2D rgbody;
 
 	// Use this for initialization
-	void Start () {
-		for (int i = 0; i < pathObjParent.transform.childCount; i++){
+	void Start () 
+	{
+		for (int i = 0; i < pathObjParent.transform.childCount; i++)
+		{
 			pathObjList.Add (pathObjParent.transform.GetChild (i).gameObject);
 		}
 
@@ -24,12 +26,14 @@ public class RingVineMovement : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update () 
+	{
 		MoveToNextPathObj ();
 
 	}
 
-	IEnumerator FadeInAndStart(){
+	IEnumerator FadeInAndStart()
+	{
 		yield return null;
 	}
 
@@ -39,16 +43,19 @@ public class RingVineMovement : MonoBehaviour {
 		GameObject pathObj = pathObjList [index];
 		float distToPoint = ((transform.position - pathObj.transform.position).magnitude);
 		Vector2 direction = pathObj.transform.position - transform.position;
-		if (distToPoint > 0) {
+		if (distToPoint > 0) 
+		{
 			canMoveToNext = false;
 			distToPoint = ((transform.position - pathObj.transform.position).magnitude);
 			direction = pathObj.transform.position - transform.position;
 			transform.position = Vector2.MoveTowards (transform.position, pathObj.transform.position, speed * Time.deltaTime);
-			if (distToPoint <= 0.05f) {
+			if (distToPoint <= 0.05f) 
+			{
 				canMoveToNext = true;
 			}
 		}
-		if (canMoveToNext) {
+		if (canMoveToNext) 
+		{
 			index = (index + 1) % (pathObjList.Count);
 			pathObj = pathObjList [index];
 		}
