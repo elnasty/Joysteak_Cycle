@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -13,6 +14,8 @@ public class PlayerMovement : MonoBehaviour {
 	private bool isMouseInterrupt;
 	private Vector2 mouseClickPos;
 	private Vector2 diffToMousePos;
+	private List<Vector2> path = new List<Vector2>();
+	private int currentPathStage = 0;
 
 	enum Direction { None = 0, Down = 1, Up = 2, Right = 3, Left = 4 };
 
@@ -28,38 +31,79 @@ public class PlayerMovement : MonoBehaviour {
 		}
     }
 
-	void ListenToMouseClick()
+	void OnCollisionEnter2D(Collision2D other)
 	{
-		if (Input.GetMouseButtonDown (0)) 
+		if (other.gameObject.tag == "Obstacle") 
 		{
-			mouseClickPos = cameraObj.ScreenToWorldPoint(Input.mousePosition);
-			diffToMousePos = mouseClickPos - (Vector2) transform.position;
-			if (Mathf.Abs (diffToMousePos.x) > Mathf.Abs (diffToMousePos.y)) 
-			{
-				if (diffToMousePos.x > 0) GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.Right);
-				if (diffToMousePos.x < 0) GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.Left);
-			}
-			else if (Mathf.Abs (diffToMousePos.x) < Mathf.Abs (diffToMousePos.y)) 
-			{
-				if (diffToMousePos.y > 0) GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.Up);
-				if (diffToMousePos.y < 0) GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.Down);
-			}
-			if (!isMoving) StartCoroutine ("MoveToMouseClick");
+			StopMoving ();
+			ContactPoint2D contact = other.contacts [0];
+			Vector2 obstaclePos = other.transform.position;
+			Vector2 contactNormal = contact.normal;
+			if (contact.normal.y < 0) transform.position = (Vector2) transform.position - new Vector2 (0,0.1f);
+			if (contact.normal.y > 0) transform.position = (Vector2) transform.position + new Vector2 (0,0.1f);
+			if (contact.normal.x < 0) transform.position = (Vector2) transform.position - new Vector2 (0.1f,0);
+			if (contact.normal.x > 0) transform.position = (Vector2) transform.position + new Vector2 (0.1f,0);
+			path.Clear ();
+			currentPathStage = 0;
 		}
 	}
 
-	IEnumerator MoveToMouseClick()
+	void StopMoving()
+	{
+		transform.GetComponent<Rigidbody2D> ().velocity = new Vector2(0,0);
+		GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.None);
+		isMoving = false;
+	}
+
+	void ListenToMouseClick()
+	{
+		if (Input.GetMouseButtonDown (0) && !isMoving) 
+		{
+			mouseClickPos = cameraObj.ScreenToWorldPoint(Input.mousePosition);
+			diffToMousePos = mouseClickPos - (Vector2) transform.position;
+			if (Mathf.Abs (diffToMousePos.x) < Mathf.Abs (diffToMousePos.y)) {
+				path.Add (new Vector2 (mouseClickPos.x, transform.position.y));
+				path.Add (new Vector2 (mouseClickPos.x, mouseClickPos.y));
+			} else {
+				path.Add (new Vector2 (transform.position.x, mouseClickPos.y));
+				path.Add (new Vector2 (mouseClickPos.x, mouseClickPos.y));
+			}
+			StartCoroutine (MoveToPosition (path [currentPathStage]));
+		}
+	}
+
+	IEnumerator MoveToPosition(Vector2 targetPos)
 	{
 		isMoving = true;
 		float step = movespeed * Time.fixedDeltaTime;
-		while (Vector2.Distance(mouseClickPos, transform.position) > 0.1f)
+		Vector2 diff = targetPos - (Vector2)transform.position;
+		if (Mathf.Abs (diff.x) > Mathf.Abs (diff.y)) 
 		{
-			transform.position = Vector2.MoveTowards (transform.position, mouseClickPos, step);
+			if (diff.x > 0) GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.Right);
+			if (diff.x < 0) GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.Left);
+		}
+		else 
+		{
+			if (diff.y > 0) GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.Up);
+			if (diff.y < 0) GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.Down);
+		}
+		while (Vector2.Distance(targetPos, transform.position) > 0.1f)
+		{
+			transform.position = Vector2.MoveTowards (transform.position, targetPos, step);
+			if (!isMoving) yield break;
 			yield return new WaitForFixedUpdate();
 		}
-		GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.None);
-		transform.GetComponent<Rigidbody2D> ().velocity = new Vector2(0,0);
-		isMoving = false;
+		StopMoving ();
+		currentPathStage++;
+		if (currentPathStage < path.Count) 
+		{
+			StartCoroutine (MoveToPosition(path[currentPathStage]));
+		}
+		else 
+		{
+			path.Clear();
+			currentPathStage = 0;
+		}
 	}
 
 	void ListenToWASD() 
@@ -84,7 +128,7 @@ public class PlayerMovement : MonoBehaviour {
 			else 
 			{
 				GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, 0);
-				if (moveX== 0 && moveY == 0) GetComponent<Animator> ().SetInteger ("Direction", 0);
+				if (moveX== 0 && moveY == 0) GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.None);
 			}
 		} 
 	}
