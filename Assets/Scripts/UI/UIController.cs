@@ -24,35 +24,14 @@ public class UIController : MonoBehaviour {
 	private bool isCurrentDialogueCollectionCompleted = true;
 
 	private DialogueCollection currentDialogCollection;
-	private Dictionary<string,DialogueCollection> dialogueCatalog = new Dictionary<string,DialogueCollection>();
 
 
 	void Awake()
 	{
 		if (instance == null) instance = this;
-		getDialogueData ();
-		currentDialogCollection = dialogueCatalog ["Event1"];
+		GameManager.instance.GetDialogueData (dialogueJSON.ToString());
+		currentDialogCollection = GameManager.instance.dialogueCatalog ["Event1"];
 
-	}
-
-	//TODO: This function should not be in the UIController
-	void getDialogueData() {
-		var dialogueCatalogData = JSON.Parse(dialogueJSON.ToString());
-		foreach (string eventName in dialogueCatalogData.Keys)
-		{
-			var dialogueLinesData = dialogueCatalogData[eventName]["dialogueLines"];
-			List<Dialogue> dialogueLines = new List<Dialogue> ();
-			for (int i = 0; i < dialogueLinesData.Count; i++)
-			{
-				var dialogueData = dialogueLinesData [i];
-				string character = dialogueData ["character"].Value;
-				string text 	 = dialogueData ["dialogue"].Value;
-				int expression 	 = dialogueData ["expression"].AsInt;
-				dialogueLines.Add (new Dialogue (character, text, expression));
-			}
-			DialogueCollection dialogueCollection = new DialogueCollection (eventName, dialogueLines);
-			dialogueCatalog.Add (eventName, dialogueCollection);
-		}
 	}
 
 
