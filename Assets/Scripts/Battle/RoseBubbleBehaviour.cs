@@ -17,12 +17,15 @@ public class RoseBubbleBehaviour : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		float distance = (transform.position - playerObj.transform.position).magnitude;
-		if (distance <= triggerRadius) {
+		if (distance <= triggerRadius) 
+		{
 			timer += Time.deltaTime;
-			if (timer >= timerTriggerValue) {
+			if (timer >= timerTriggerValue) 
+			{
 				Debug.Log ("Rose bud activated");
 			}
-		} else {
+		} else 
+		{
 			timer = 0; //reset timer if no longer within range
 		}
 	}
