@@ -13,7 +13,6 @@ public class PlayerMovement : MonoBehaviour {
 	private bool isMoving;
 	private bool isMouseInterrupt;
 	private Vector2 mouseClickPos;
-	private Vector2 diffToMousePos;
 	private List<Vector2> path = new List<Vector2>();
 	private int currentPathStage = 0;
 
@@ -35,14 +34,21 @@ public class PlayerMovement : MonoBehaviour {
 	{
 		if (other.gameObject.tag == "Obstacle") 
 		{
+			// Stop moving everytime player hits an obstacle
 			StopMoving ();
+
+			// Finding direction of collision
 			ContactPoint2D contact = other.contacts [0];
 			Vector2 obstaclePos = other.transform.position;
 			Vector2 contactNormal = contact.normal;
+
+			// To prevent colliders from overlapping, add buffer distance between colliders
 			if (contact.normal.y < 0) transform.position = (Vector2) transform.position - new Vector2 (0,0.1f);
 			if (contact.normal.y > 0) transform.position = (Vector2) transform.position + new Vector2 (0,0.1f);
 			if (contact.normal.x < 0) transform.position = (Vector2) transform.position - new Vector2 (0.1f,0);
 			if (contact.normal.x > 0) transform.position = (Vector2) transform.position + new Vector2 (0.1f,0);
+
+			// TODO: Recreate list of paths to reach to mouseClickPos
 			path.Clear ();
 			currentPathStage = 0;
 		}
@@ -60,14 +66,22 @@ public class PlayerMovement : MonoBehaviour {
 		if (Input.GetMouseButtonDown (0) && !isMoving) 
 		{
 			mouseClickPos = cameraObj.ScreenToWorldPoint(Input.mousePosition);
-			diffToMousePos = mouseClickPos - (Vector2) transform.position;
-			if (Mathf.Abs (diffToMousePos.x) < Mathf.Abs (diffToMousePos.y)) {
+			Vector2 diffToMousePos = mouseClickPos - (Vector2) transform.position;
+
+			// Add the straight path with the smaller displacement into the path list first
+			// TODO: Create right path from the start instead of dynamically changing list of paths
+			if (Mathf.Abs (diffToMousePos.x) < Mathf.Abs (diffToMousePos.y))
+			{
 				path.Add (new Vector2 (mouseClickPos.x, transform.position.y));
 				path.Add (new Vector2 (mouseClickPos.x, mouseClickPos.y));
-			} else {
+			}
+			else 
+			{
 				path.Add (new Vector2 (transform.position.x, mouseClickPos.y));
 				path.Add (new Vector2 (mouseClickPos.x, mouseClickPos.y));
 			}
+
+			// Begin executing chain of paths
 			StartCoroutine (MoveToPosition (path [currentPathStage]));
 		}
 	}
@@ -77,6 +91,9 @@ public class PlayerMovement : MonoBehaviour {
 		isMoving = true;
 		float step = movespeed * Time.fixedDeltaTime;
 		Vector2 diff = targetPos - (Vector2)transform.position;
+
+		// Show walking animation for axis with the bigger displacement
+		// i.e. More horizontal displacement = show Right/Left walking animation
 		if (Mathf.Abs (diff.x) > Mathf.Abs (diff.y)) 
 		{
 			if (diff.x > 0) GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.Right);
@@ -87,6 +104,8 @@ public class PlayerMovement : MonoBehaviour {
 			if (diff.y > 0) GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.Up);
 			if (diff.y < 0) GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.Down);
 		}
+
+		// Keep walking towards target until !isMoving or player reach it's destination
 		while (Vector2.Distance(targetPos, transform.position) > 0.1f)
 		{
 			transform.position = Vector2.MoveTowards (transform.position, targetPos, step);
@@ -94,8 +113,9 @@ public class PlayerMovement : MonoBehaviour {
 			yield return new WaitForFixedUpdate();
 		}
 		StopMoving ();
-		currentPathStage++;
-		if (currentPathStage < path.Count) 
+
+		// Begin walking towards next path in the chain/path-list, or stop walking
+		if (++currentPathStage < path.Count) 
 		{
 			StartCoroutine (MoveToPosition(path[currentPathStage]));
 		}
