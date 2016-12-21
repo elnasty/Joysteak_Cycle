@@ -7,7 +7,8 @@ public class GameManager : MonoBehaviour {
 
 	static GameManager _instance;
 
-	public bool isMouseControl = false;
+	public bool isMouseControl = true;
+
 	public Dictionary<string,DialogueCollection> dialogueCatalog = new Dictionary<string,DialogueCollection>();
 
 	public static GameManager instance 
