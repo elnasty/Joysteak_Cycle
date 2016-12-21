@@ -7,6 +7,8 @@ public class BackgroundBehavior : MonoBehaviour
     public GameObject BackgroundBack;
     public GameObject Elliot;
 
+	public bool isLevelReadyToStart = false;
+
     // Use this for initialization
     void Start()
     {
@@ -33,6 +35,11 @@ public class BackgroundBehavior : MonoBehaviour
             currentTime += Time.deltaTime;
             yield return null;
         } while (currentTime <= time);
+		if (gameObj.Equals (Elliot)) {
+			Debug.Log ("Ready");
+			isLevelReadyToStart = true; //true after the level loads and mini-cutscene at the start is done, 
+			//controls whether the actual battle can start or not
+		}
     }
 
     // Update is called once per frame

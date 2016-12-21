@@ -9,7 +9,7 @@ public class MouseOverBehavior : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        Cursor.visible = true;
+        //Cursor.visible = false;
     }
 
     // Update is called once per frame
