@@ -18,7 +18,7 @@ public class PlayerMovement : MonoBehaviour {
 
 	enum Direction { None = 0, Down = 1, Up = 2, Right = 3, Left = 4 };
 
-	void Dijkstra()
+	Stack<Waypoint> Dijkstra()
 	{
 		List<Waypoint> waypoints = new List<Waypoint> ();
 		float nearestDistFromPlayer = int.MaxValue;
@@ -51,6 +51,7 @@ public class PlayerMovement : MonoBehaviour {
 		}
 
 		source.distToSource = 0; // Distance of source to itself is 0
+		source.prevOptimalWaypoint = null; // Not possible to have waypoint before source
 			
 		while (waypoints.Count > 0)
 		{
@@ -84,7 +85,18 @@ public class PlayerMovement : MonoBehaviour {
 			if (currentWaypoint.Equals (target)) break;
 
 		}
+
+		// Create a stack of waypoints that will be path from source to target
+		Stack<Waypoint> waypointStack = new Stack<Waypoint>();
+		waypointStack.Push (target);
+		Waypoint nextWaypoint = target.prevOptimalWaypoint;
+		while (nextWaypoint != null) 
+		{
+			waypointStack.Push (nextWaypoint);
+			nextWaypoint = nextWaypoint.prevOptimalWaypoint;
+		}
 			
+		return waypointStack;
 	}
 
     void Update()
