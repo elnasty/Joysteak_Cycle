@@ -5,5 +5,7 @@ using UnityEngine;
 public class Waypoint : MonoBehaviour {
 	
 	public List<GameObject> waypoints;
+	public int distToSource;
+	public Waypoint prevOptimalWaypoint;
 
 }

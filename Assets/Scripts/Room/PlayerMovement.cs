@@ -7,15 +7,85 @@ public class PlayerMovement : MonoBehaviour {
 
     public float movespeed;
 	public Camera cameraObj;
-	public List<GameObject> wayPoints;
+	public List<GameObject> waypointObjects;
+
     private float moveY;
     private float moveX;
 	private bool isMouseInterrupt;
 	private Vector2 mouseClickPos;
-	private List<Vector2> path = new List<Vector2>();
+	private List<Vector2> straightPaths = new List<Vector2>();
 	private int currentPathIndex = 0;
 
 	enum Direction { None = 0, Down = 1, Up = 2, Right = 3, Left = 4 };
+
+	void Dijkstra()
+	{
+		List<Waypoint> waypoints = new List<Waypoint> ();
+		float nearestDistFromPlayer = int.MaxValue;
+		float nearestDistFromTarget = int.MaxValue;
+		Waypoint source = null;
+		Waypoint target = null;
+
+		foreach (GameObject waypointObj in waypointObjects) 
+		{
+			Waypoint waypoint = waypointObj.transform.GetComponent<Waypoint> ();
+			waypoint.distToSource = int.MaxValue;
+			waypoint.prevOptimalWaypoint = null;
+			waypoints.Add (waypoint);
+
+			// Find source: Waypoint that is nearest to player
+			float distFromPlayer = ((Vector2)waypoint.transform.position - (Vector2)transform.position).magnitude;
+			if (distFromPlayer < nearestDistFromPlayer) 
+			{
+				nearestDistFromPlayer = distFromPlayer;
+				source = waypoint;
+			}
+
+			// Find target: Waypoint that is nearest to target position
+			float distFromTarget = ((Vector2)waypoint.transform.position - (Vector2)mouseClickPos).magnitude;
+			if (distFromTarget < nearestDistFromTarget) 
+			{
+				nearestDistFromTarget = distFromTarget;
+				target = waypoint;
+			}
+		}
+
+		source.distToSource = 0; // Distance of source to itself is 0
+			
+		while (waypoints.Count > 0)
+		{
+			// Get waypoint that has minimum dist in the list
+			int minDist = int.MaxValue;
+			Waypoint currentWaypoint = null;
+			foreach (Waypoint waypoint in waypoints) 
+			{
+				if (waypoint.distToSource < minDist) 
+				{
+					minDist = waypoint.distToSource;
+					currentWaypoint = waypoint;
+				}
+			}
+
+			waypoints.Remove (currentWaypoint);
+
+			List<GameObject> neighbourWaypointObjects = currentWaypoint.waypoints;
+			foreach (GameObject waypointObj in neighbourWaypointObjects)
+			{
+				Waypoint neighbourWaypoint = waypointObj.transform.GetComponent<Waypoint> ();
+				int alternateDist = currentWaypoint.distToSource + 1;
+				if (alternateDist < neighbourWaypoint.distToSource) 
+				{
+					neighbourWaypoint.distToSource = alternateDist;
+					neighbourWaypoint.prevOptimalWaypoint = currentWaypoint;
+				}
+			}
+
+			// Stop searching: we have found our target
+			if (currentWaypoint.Equals (target)) break;
+
+		}
+			
+	}
 
     void Update()
     {
@@ -47,7 +117,7 @@ public class PlayerMovement : MonoBehaviour {
 			if (contact.normal.x < 0) transform.position = (Vector2) transform.position - new Vector2 (0.1f,0);
 			if (contact.normal.x > 0) transform.position = (Vector2) transform.position + new Vector2 (0.1f,0);
 
-			path.Clear ();
+			straightPaths.Clear ();
 			currentPathIndex = 0;
 		}
 	}
@@ -64,33 +134,36 @@ public class PlayerMovement : MonoBehaviour {
 		if (Input.GetMouseButtonDown (0)) 
 		{
 			StopMoving ();
-			path.Clear ();
+			straightPaths.Clear ();
 			currentPathIndex = 0;
 			mouseClickPos = cameraObj.ScreenToWorldPoint(Input.mousePosition);
 			Vector2 diffToMousePos = mouseClickPos - (Vector2) transform.position;
 
-			// Add the straight path with the smaller displacement into the path list first
+			// Add the straight path with the smaller displacement into the straightPaths list first
+			// (Avoid making Casey walk diagonally as no animation for it yet)
 			// TODO: Create right path from the start instead of dynamically changing list of paths
 			if (Mathf.Abs (diffToMousePos.x) < Mathf.Abs (diffToMousePos.y))
 			{
-				path.Add (new Vector2 (mouseClickPos.x, transform.position.y));
-				path.Add (new Vector2 (mouseClickPos.x, mouseClickPos.y));
+				straightPaths.Add (new Vector2 (mouseClickPos.x, transform.position.y));
+				straightPaths.Add (new Vector2 (mouseClickPos.x, mouseClickPos.y));
 			}
 			else 
 			{
-				path.Add (new Vector2 (transform.position.x, mouseClickPos.y));
-				path.Add (new Vector2 (mouseClickPos.x, mouseClickPos.y));
+				straightPaths.Add (new Vector2 (transform.position.x, mouseClickPos.y));
+				straightPaths.Add (new Vector2 (mouseClickPos.x, mouseClickPos.y));
 			}
 
 			// Begin executing chain of paths
 			StartCoroutine ("MoveToPosition");
+
+			Dijkstra ();
 		}
 	}
 
 	IEnumerator MoveToPosition()
 	{
 		float step = movespeed * Time.fixedDeltaTime;
-		Vector2 targetPos = path[currentPathIndex];
+		Vector2 targetPos = straightPaths[currentPathIndex];
 		Vector2 diff = targetPos - (Vector2)transform.position;
 
 		// Show walking animation for axis with the bigger displacement
@@ -106,7 +179,7 @@ public class PlayerMovement : MonoBehaviour {
 			if (diff.y < 0) GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.Down);
 		}
 
-		// Keep walking towards target until !isMoving or player reach it's destination
+		// Keep walking towards target until player reach it's destination
 		while (Vector2.Distance(targetPos, transform.position) > 0.1f)
 		{
 			transform.position = Vector2.MoveTowards (transform.position, targetPos, step);
@@ -116,13 +189,13 @@ public class PlayerMovement : MonoBehaviour {
 		StopMoving ();
 
 		// Begin walking towards next path in the chain/path-list, or stop walking
-		if (++currentPathIndex < path.Count) 
+		if (++currentPathIndex < straightPaths.Count) 
 		{
 			StartCoroutine ("MoveToPosition");
 		}
 		else 
 		{
-			path.Clear();
+			straightPaths.Clear();
 			currentPathIndex = 0;
 		}
 	}
