@@ -19,6 +19,11 @@ public class BackgroundBehavior : MonoBehaviour
         StartCoroutine(FadeIn(BackgroundFront, 2f, 1f));
         StartCoroutine(FadeIn(BackgroundBack, 3f, 1f));
         StartCoroutine(FadeIn(Elliot, 4.5f, 1f));
+
+
+		if (GameManager.instance.isMouseControl) {
+		}
+
     }
 
     IEnumerator FadeIn(GameObject gameObj, float delay, float time)
