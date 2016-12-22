@@ -47,7 +47,6 @@ public class PlayerMovement : MonoBehaviour {
 			if (contact.normal.x < 0) transform.position = (Vector2) transform.position - new Vector2 (0.1f,0);
 			if (contact.normal.x > 0) transform.position = (Vector2) transform.position + new Vector2 (0.1f,0);
 
-			// TODO: Recreate list of paths to reach to mouseClickPos
 			path.Clear ();
 			currentPathIndex = 0;
 		}
