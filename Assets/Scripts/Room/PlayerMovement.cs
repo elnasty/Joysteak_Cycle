@@ -7,7 +7,7 @@ public class PlayerMovement : MonoBehaviour {
 
     public float movespeed;
 	public Camera cameraObj;
-	public List<GameObject> waypointObjects;
+	public GameObject waypointsCollection;
 
     private float moveY;
     private float moveX;
@@ -15,8 +15,16 @@ public class PlayerMovement : MonoBehaviour {
 	private Vector2 mouseClickPos;
 	private List<Vector2> straightPaths = new List<Vector2>();
 	private int currentPathIndex = 0;
+	private List<GameObject> waypointObjects = new List<GameObject>();
 
 	enum Direction { None = 0, Down = 1, Up = 2, Right = 3, Left = 4 };
+
+	void Start()
+	{
+		// Initialize waypointObjects list, which will be used for pathfinding
+		foreach (Transform child in waypointsCollection.transform) 
+			waypointObjects.Add (child.gameObject);
+	}
 
 	Stack<Waypoint> Dijkstra()
 	{
