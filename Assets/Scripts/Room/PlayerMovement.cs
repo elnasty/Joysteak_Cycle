@@ -107,18 +107,6 @@ public class PlayerMovement : MonoBehaviour {
 		return waypointStack;
 	}
 
-    void Update()
-    {
-		if (GameManager.instance.isMouseControl) 
-		{
-			ListenToMouseClick ();
-		} 
-		else 
-		{
-			ListenToWASD ();
-		}
-    }
-
 	void OnCollisionEnter2D(Collision2D other)
 	{
 		if (other.gameObject.tag == "Obstacle") 
@@ -149,46 +137,44 @@ public class PlayerMovement : MonoBehaviour {
 		GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.None);
 	}
 
-	void ListenToMouseClick()
+	public void MoveToMouseClick()
 	{
-		if (Input.GetMouseButtonDown (0)) 
+		RoomController.instance.isPlayerMoving = true;
+
+		StopMoving ();
+		straightPaths.Clear ();
+		currentPathIndex = 0;
+		mouseClickPos = cameraObj.ScreenToWorldPoint(Input.mousePosition);
+
+		// Execute dijstra to return a stack of waypoints leading from playerPos to mousceClickPos
+		Stack<Waypoint> waypointStack = Dijkstra ();
+		Vector2 prevWaypointPos = (Vector2)transform.position;
+
+		// Unroll waypoints stack and add them to path to traverse
+		while (waypointStack.Count > 0) 
 		{
-			StopMoving ();
-			straightPaths.Clear ();
-			currentPathIndex = 0;
-			mouseClickPos = cameraObj.ScreenToWorldPoint(Input.mousePosition);
+			Waypoint currentWaypoint = waypointStack.Pop ();
+			Vector2 waypointPos = currentWaypoint.gameObject.transform.position;
+			Vector2 diffFromPrev = waypointPos - (Vector2) prevWaypointPos;
 
-			// Execute dijstra to return a stack of waypoints leading from playerPos to mousceClickPos
-			Stack<Waypoint> waypointStack = Dijkstra ();
-			Vector2 prevWaypointPos = (Vector2)transform.position;
-
-			// Unroll waypoints stack and add them to path to traverse
-			while (waypointStack.Count > 0) 
+			// Add the straight path with the smaller displacement into the straightPaths list first
+			// (Avoid making Casey walk diagonally as no animation for it yet)
+			if (Mathf.Abs (diffFromPrev.x) < Mathf.Abs (diffFromPrev.y)) 
 			{
-				Waypoint currentWaypoint = waypointStack.Pop ();
-				Vector2 waypointPos = currentWaypoint.gameObject.transform.position;
-				Vector2 diffFromPrev = waypointPos - (Vector2) prevWaypointPos;
-
-				// Add the straight path with the smaller displacement into the straightPaths list first
-				// (Avoid making Casey walk diagonally as no animation for it yet)
-				if (Mathf.Abs (diffFromPrev.x) < Mathf.Abs (diffFromPrev.y)) 
-				{
-					straightPaths.Add (new Vector2 (waypointPos.x, prevWaypointPos.y));
-					straightPaths.Add (new Vector2 (waypointPos.x, waypointPos.y));
-				}
-				else 
-				{
-					straightPaths.Add (new Vector2 (prevWaypointPos.x, waypointPos.y));
-					straightPaths.Add (new Vector2 (waypointPos.x, waypointPos.y));
-				}
-
-				prevWaypointPos = waypointPos;
+				straightPaths.Add (new Vector2 (waypointPos.x, prevWaypointPos.y));
+				straightPaths.Add (new Vector2 (waypointPos.x, waypointPos.y));
 			}
-				
-			// Begin executing chain of paths
-			StartCoroutine ("MoveToPosition");
+			else 
+			{
+				straightPaths.Add (new Vector2 (prevWaypointPos.x, waypointPos.y));
+				straightPaths.Add (new Vector2 (waypointPos.x, waypointPos.y));
+			}
 
+			prevWaypointPos = waypointPos;
 		}
+			
+		// Begin executing chain of paths
+		StartCoroutine ("MoveToPosition");
 	}
 
 	IEnumerator MoveToPosition()
@@ -226,12 +212,13 @@ public class PlayerMovement : MonoBehaviour {
 		}
 		else 
 		{
+			RoomController.instance.isPlayerMoving = false;
 			straightPaths.Clear();
 			currentPathIndex = 0;
 		}
 	}
 
-	void ListenToWASD() 
+	public void MoveByWASD() 
 	{
 		moveX = Input.GetAxisRaw ("Horizontal");
 		moveY = Input.GetAxisRaw ("Vertical");
