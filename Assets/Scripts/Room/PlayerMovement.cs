@@ -14,7 +14,7 @@ public class PlayerMovement : MonoBehaviour {
 	private bool isMouseInterrupt;
 	private Vector2 mouseClickPos;
 	private List<Vector2> path = new List<Vector2>();
-	private int currentPathStage = 0;
+	private int currentPathIndex = 0;
 
 	enum Direction { None = 0, Down = 1, Up = 2, Right = 3, Left = 4 };
 
@@ -50,12 +50,13 @@ public class PlayerMovement : MonoBehaviour {
 
 			// TODO: Recreate list of paths to reach to mouseClickPos
 			path.Clear ();
-			currentPathStage = 0;
+			currentPathIndex = 0;
 		}
 	}
 
 	void StopMoving()
 	{
+		StopCoroutine("MoveToPosition");
 		transform.GetComponent<Rigidbody2D> ().velocity = new Vector2(0,0);
 		GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.None);
 		isMoving = false;
@@ -63,8 +64,11 @@ public class PlayerMovement : MonoBehaviour {
 
 	void ListenToMouseClick()
 	{
-		if (Input.GetMouseButtonDown (0) && !isMoving) 
+		if (Input.GetMouseButtonDown (0)) 
 		{
+			StopMoving ();
+			path.Clear ();
+			currentPathIndex = 0;
 			mouseClickPos = cameraObj.ScreenToWorldPoint(Input.mousePosition);
 			Vector2 diffToMousePos = mouseClickPos - (Vector2) transform.position;
 
@@ -82,14 +86,15 @@ public class PlayerMovement : MonoBehaviour {
 			}
 
 			// Begin executing chain of paths
-			StartCoroutine (MoveToPosition (path [currentPathStage]));
+			if (!isMoving) StartCoroutine ("MoveToPosition");
 		}
 	}
 
-	IEnumerator MoveToPosition(Vector2 targetPos)
+	IEnumerator MoveToPosition()
 	{
 		isMoving = true;
 		float step = movespeed * Time.fixedDeltaTime;
+		Vector2 targetPos = path[currentPathIndex];
 		Vector2 diff = targetPos - (Vector2)transform.position;
 
 		// Show walking animation for axis with the bigger displacement
@@ -109,20 +114,20 @@ public class PlayerMovement : MonoBehaviour {
 		while (Vector2.Distance(targetPos, transform.position) > 0.1f)
 		{
 			transform.position = Vector2.MoveTowards (transform.position, targetPos, step);
-			if (!isMoving) yield break;
+			if(!isMoving) yield break;
 			yield return new WaitForFixedUpdate();
 		}
 		StopMoving ();
 
 		// Begin walking towards next path in the chain/path-list, or stop walking
-		if (++currentPathStage < path.Count) 
+		if (++currentPathIndex < path.Count) 
 		{
-			StartCoroutine (MoveToPosition(path[currentPathStage]));
+			StartCoroutine ("MoveToPosition");
 		}
 		else 
 		{
 			path.Clear();
-			currentPathStage = 0;
+			currentPathIndex = 0;
 		}
 	}
 
