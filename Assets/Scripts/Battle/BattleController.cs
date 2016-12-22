@@ -70,6 +70,11 @@ public class BattleController : MonoBehaviour {
 		}
 	}
 
+	public void AffectPlayerHealth(int value)
+	{
+		Heart.GetComponent<Heart> ().HeartAffectHealth (value);
+	}
+
 	//BackgroundScroll
 
 	//MoveLevel //(move and rotate level accordingly)

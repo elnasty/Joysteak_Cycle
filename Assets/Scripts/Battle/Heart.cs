@@ -42,13 +42,10 @@ public class Heart : MonoBehaviour
 		//KnockedBack();
 		speed = 0;
 
-		if (darkening < darkeningMax)
-		{
-			darkening += 1;
-			StartCoroutine(Beat(HeartBeat));
-		}
+
 	
 	}
+
 	void Update()
 	{
 		// Darkening
@@ -195,4 +192,13 @@ public class Heart : MonoBehaviour
 
 		
     }
+
+	public void HeartAffectHealth(int value)
+	{
+		if (darkening < darkeningMax)
+		{
+			darkening += value;
+			StartCoroutine(Beat(HeartBeat));
+		}
+	}
 }

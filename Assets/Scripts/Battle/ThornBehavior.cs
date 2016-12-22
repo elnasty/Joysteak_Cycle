@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ThornBehavior : MonoBehaviour
+public class ThornBehavior : Projectile
 {
     private GameObject target;
     public float velocity;
