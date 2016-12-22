@@ -10,7 +10,6 @@ public class PlayerMovement : MonoBehaviour {
 	public List<GameObject> wayPoints;
     private float moveY;
     private float moveX;
-	private bool isMoving;
 	private bool isMouseInterrupt;
 	private Vector2 mouseClickPos;
 	private List<Vector2> path = new List<Vector2>();
@@ -59,7 +58,6 @@ public class PlayerMovement : MonoBehaviour {
 		StopCoroutine("MoveToPosition");
 		transform.GetComponent<Rigidbody2D> ().velocity = new Vector2(0,0);
 		GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.None);
-		isMoving = false;
 	}
 
 	void ListenToMouseClick()
@@ -86,13 +84,12 @@ public class PlayerMovement : MonoBehaviour {
 			}
 
 			// Begin executing chain of paths
-			if (!isMoving) StartCoroutine ("MoveToPosition");
+			StartCoroutine ("MoveToPosition");
 		}
 	}
 
 	IEnumerator MoveToPosition()
 	{
-		isMoving = true;
 		float step = movespeed * Time.fixedDeltaTime;
 		Vector2 targetPos = path[currentPathIndex];
 		Vector2 diff = targetPos - (Vector2)transform.position;
@@ -114,9 +111,9 @@ public class PlayerMovement : MonoBehaviour {
 		while (Vector2.Distance(targetPos, transform.position) > 0.1f)
 		{
 			transform.position = Vector2.MoveTowards (transform.position, targetPos, step);
-			if(!isMoving) yield break;
 			yield return new WaitForFixedUpdate();
 		}
+
 		StopMoving ();
 
 		// Begin walking towards next path in the chain/path-list, or stop walking
