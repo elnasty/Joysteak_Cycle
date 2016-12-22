@@ -149,26 +149,39 @@ public class PlayerMovement : MonoBehaviour {
 			straightPaths.Clear ();
 			currentPathIndex = 0;
 			mouseClickPos = cameraObj.ScreenToWorldPoint(Input.mousePosition);
-			Vector2 diffToMousePos = mouseClickPos - (Vector2) transform.position;
 
-			// Add the straight path with the smaller displacement into the straightPaths list first
-			// (Avoid making Casey walk diagonally as no animation for it yet)
-			// TODO: Create right path from the start instead of dynamically changing list of paths
-			if (Mathf.Abs (diffToMousePos.x) < Mathf.Abs (diffToMousePos.y))
+			// Execute dijstra to return a stack of waypoints leading from playerPos to mousceClickPos
+			Stack<Waypoint> waypointStack = Dijkstra ();
+			Vector2 prevWaypointPos = (Vector2)transform.position;
+
+			// Unroll waypoints stack and add them to path to traverse
+			while (waypointStack.Count > 0) 
 			{
-				straightPaths.Add (new Vector2 (mouseClickPos.x, transform.position.y));
-				straightPaths.Add (new Vector2 (mouseClickPos.x, mouseClickPos.y));
+				Waypoint currentWaypoint = waypointStack.Pop ();
+				Vector2 waypointPos = currentWaypoint.gameObject.transform.position;
+				Vector2 diffFromPrev = waypointPos - (Vector2) prevWaypointPos;
+
+				// Add the straight path with the smaller displacement into the straightPaths list first
+				// (Avoid making Casey walk diagonally as no animation for it yet)
+				if (Mathf.Abs (diffFromPrev.x) < Mathf.Abs (diffFromPrev.y)) 
+				{
+					straightPaths.Add (new Vector2 (waypointPos.x, prevWaypointPos.y));
+					straightPaths.Add (new Vector2 (waypointPos.x, waypointPos.y));
+				}
+				else 
+				{
+					straightPaths.Add (new Vector2 (prevWaypointPos.x, waypointPos.y));
+					straightPaths.Add (new Vector2 (waypointPos.x, waypointPos.y));
+				}
+
+				prevWaypointPos = waypointPos;
 			}
-			else 
-			{
-				straightPaths.Add (new Vector2 (transform.position.x, mouseClickPos.y));
-				straightPaths.Add (new Vector2 (mouseClickPos.x, mouseClickPos.y));
-			}
+
+			straightPaths.Add (mouseClickPos);
 
 			// Begin executing chain of paths
 			StartCoroutine ("MoveToPosition");
 
-			Dijkstra ();
 		}
 	}
 
