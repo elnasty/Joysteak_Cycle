@@ -176,9 +176,7 @@ public class PlayerMovement : MonoBehaviour {
 
 				prevWaypointPos = waypointPos;
 			}
-
-			straightPaths.Add (mouseClickPos);
-
+				
 			// Begin executing chain of paths
 			StartCoroutine ("MoveToPosition");
 
