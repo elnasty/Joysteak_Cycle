@@ -32,6 +32,9 @@ public class RoomController : MonoBehaviour {
 
 			if (isPlayerMoving == false && isInteractableSelected == true) 
 			{
+				// TODO: [Note to Stanley]
+				// If you want to show dialogue, you may call UIController from here
+				// before you begin loading the battle scene.
 				StartCoroutine(LoadBattleScene(sceneToLoad));
 				isInteractableSelected = false;
 			}

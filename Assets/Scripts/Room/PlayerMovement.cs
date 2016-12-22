@@ -11,7 +11,6 @@ public class PlayerMovement : MonoBehaviour {
 
     private float moveY;
     private float moveX;
-	private bool isMouseInterrupt;
 	private Vector2 mouseClickPos;
 	private List<Vector2> straightPaths = new List<Vector2>();
 	private int currentPathIndex = 0;
