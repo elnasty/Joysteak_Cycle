@@ -42,8 +42,6 @@ public class Heart : MonoBehaviour
 		//KnockedBack();
 		speed = 0;
 
-
-	
 	}
 
 	void Update()

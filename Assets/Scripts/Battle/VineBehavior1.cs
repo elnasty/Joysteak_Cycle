@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
-using ObjectPooler;
 
-public class VineBehavior1 : MonoBehaviour
+public class VineBehavior1 : Projectile
 {
     // Use this for initialization
     void Start()
@@ -46,7 +45,7 @@ public class VineBehavior1 : MonoBehaviour
 
     void Fire()
     {
-        GameObject thorn = GameObjectPooler.current.GetPooledObject(SpawnObjectEnum.thorn);
+        GameObject thorn = BattleController.instance.GetPooledObject(BattleController.SpawnObjectEnum.thorn);
         if (thorn == null) return;
 
         thorn.transform.position = transform.GetChild(0).position;

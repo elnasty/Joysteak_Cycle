@@ -4,7 +4,6 @@ using System.Collections;
 public class ThornBehavior : Projectile
 {
     private GameObject target;
-    public float velocity;
 
     private float turnspeed;
     private float homingSensitivity = 0.05f;
@@ -50,7 +49,7 @@ public class ThornBehavior : Projectile
                 transform.rotation = Quaternion.Slerp(transform.rotation, rotation, homingSensitivity);
             }
 
-            transform.Translate(Vector2.up * velocity * Time.deltaTime, Space.Self);
+            transform.Translate(Vector2.up * base.velocity * Time.deltaTime, Space.Self);
         }
     }
 
