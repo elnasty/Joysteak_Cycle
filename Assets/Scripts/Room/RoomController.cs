@@ -11,7 +11,7 @@ public class RoomController : MonoBehaviour {
 	public GameObject playerObject;
 	public GameObject transitionCircle;
 	public bool isPlayerMoving = false;
-	public bool isInteractableSelected = false;
+	public Waypoint selectedInteractableWaypoint;
 	public string sceneToLoad = "";
 
 	private PlayerMovement player;
@@ -26,19 +26,25 @@ public class RoomController : MonoBehaviour {
 	{
 		if (GameManager.instance.isMouseControl) 
 		{
+			// On mouse click, move player to mouse click position
 			if (Input.GetMouseButtonDown (0)) 
 			{
 				Vector2 targetPos = cameraObj.ScreenToWorldPoint(Input.mousePosition);
 				player.MovePlayerTo (targetPos);
 			}
 
-			if (isPlayerMoving == false && isInteractableSelected == true) 
+			// When player stops moving, check for following event(s)
+			if (isPlayerMoving == false) 
 			{
-				// TODO: [Note to Stanley]
-				// If you want to show dialogue, you may call UIController from here
-				// before you begin loading the battle scene.
-				StartCoroutine(LoadBattleScene(sceneToLoad));
-				isInteractableSelected = false;
+				// Event: If player is at selected waypoint attached to gameobject, starts dialogue and battle
+				if (selectedInteractableWaypoint != null) 
+				{
+					Vector2 interactableWaypointPos = selectedInteractableWaypoint.gameObject.transform.position;
+					Vector2 playerPos = player.gameObject.transform.position;
+					if ((interactableWaypointPos - playerPos).magnitude <= 0.1) 
+						StartCoroutine (LoadBattleScene (sceneToLoad));
+				}
+
 			}
 		}
 		else
