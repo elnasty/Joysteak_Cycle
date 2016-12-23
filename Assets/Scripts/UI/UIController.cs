@@ -12,6 +12,7 @@ public class UIController : MonoBehaviour {
 	public float textboxspeed;
 	public GameObject m_dialogueBox;
 	public GameObject m_dialogueText;
+	public GameObject m_faceBox;
 	public AudioClip typeSound1;
 	public AudioClip typeSound2;
 	public enum Expression { Neutral, Happy, Sad, Angry, Surprised };
@@ -44,12 +45,14 @@ public class UIController : MonoBehaviour {
 				ShowNextDialogueInCurrentCollection ();
 				if (isCurrentDialogueCollectionCompleted)
 				{
+					m_faceBox.SetActive (false);
 					MoveDialogueBox ();
 				}
 			}
 		}
 		else
 		{
+			m_faceBox.SetActive (true);
 			MoveDialogueBox ();
 			ShowNextDialogueInCurrentCollection ();
 		}
