@@ -7,20 +7,28 @@ using UnityEngine.SceneManagement;
 public class RoomController : MonoBehaviour {
 
 	public static RoomController instance;
+
+	[Header("Dialogue UI")]
+	public TextAsset dialogueJSON;
+	private DialogueCollection currentDialogCollection;
+
+	[Header("Player Movement")]
 	public Camera cameraObj;
 	public GameObject playerObject;
 	public GameObject transitionCircle;
-	public bool isPlayerMoving = false;
 	public Waypoint selectedInteractableWaypoint;
+	public bool isPlayerMoving = false;
 	public string sceneToLoad = "";
-
 	private PlayerMovement player;
 
-	void Start()
+
+	void Awake()
 	{
 		if (instance == null) instance = this;
 		player = playerObject.transform.GetComponent<PlayerMovement> ();
+		GameManager.instance.GetDialogueData (dialogueJSON.ToString());
 	}
+
 
 	void Update ()
 	{
@@ -29,20 +37,41 @@ public class RoomController : MonoBehaviour {
 			// On mouse click, move player to mouse click position
 			if (Input.GetMouseButtonDown (0)) 
 			{
-				Vector2 targetPos = cameraObj.ScreenToWorldPoint(Input.mousePosition);
-				player.MovePlayerTo (targetPos);
+				if (!UIController.instance.isShowingDialogueBox) 
+				{
+					Vector2 targetPos = cameraObj.ScreenToWorldPoint (Input.mousePosition);
+					player.MovePlayerTo (targetPos);
+				}
 			}
 
 			// When player stops moving, check for following event(s)
 			if (isPlayerMoving == false) 
 			{
-				// Event: If player is at selected waypoint attached to gameobject, starts dialogue and battle
+				// Event: If player is at selected waypoint attached to interactable, starts dialogue and battle
 				if (selectedInteractableWaypoint != null) 
 				{
 					Vector2 interactableWaypointPos = selectedInteractableWaypoint.gameObject.transform.position;
 					Vector2 playerPos = player.gameObject.transform.position;
+
+					// Check if player is at selected waypoint attached to interactable object
 					if ((interactableWaypointPos - playerPos).magnitude <= 0.1) 
-						StartCoroutine (LoadBattleScene (sceneToLoad));
+					{
+						// TODO:
+						// Here is a sample on how you can make use of UI controller to coordinate dialogue events
+						// This can be used in BattleController as well
+
+						currentDialogCollection = GameManager.instance.dialogueCatalog ["Event1"];
+						int currentDialogueIndex = currentDialogCollection.CurrentIndex;
+						int maxDialogueLines = currentDialogCollection.DialogueList.Count;
+
+						if (Input.GetMouseButtonDown (0)) 
+						{
+							UIController.instance.ShowNextDialogue (currentDialogCollection);
+							if (currentDialogueIndex >= maxDialogueLines)
+								StartCoroutine (LoadBattleScene (sceneToLoad));
+								
+						}
+					}
 				}
 
 			}
