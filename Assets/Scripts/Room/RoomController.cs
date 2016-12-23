@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class RoomController : MonoBehaviour {
 
 	public static RoomController instance;
+	public Camera cameraObj;
 	public GameObject playerObject;
 	public GameObject transitionCircle;
 	public bool isPlayerMoving = false;
@@ -27,7 +28,8 @@ public class RoomController : MonoBehaviour {
 		{
 			if (Input.GetMouseButtonDown (0)) 
 			{
-				player.MoveToMouseClick ();
+				Vector2 targetPos = cameraObj.ScreenToWorldPoint(Input.mousePosition);
+				player.MovePlayerTo (targetPos);
 			}
 
 			if (isPlayerMoving == false && isInteractableSelected == true) 

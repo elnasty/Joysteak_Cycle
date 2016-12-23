@@ -6,12 +6,11 @@ using System.Collections.Generic;
 public class PlayerMovement : MonoBehaviour {
 
     public float movespeed;
-	public Camera cameraObj;
 	public GameObject waypointsCollection;
 
     private float moveY;
     private float moveX;
-	private Vector2 mouseClickPos;
+	private Vector2 targetPos;
 	private List<Vector2> straightPaths = new List<Vector2>();
 	private int currentPathIndex = 0;
 	private List<GameObject> waypointObjects = new List<GameObject>();
@@ -49,7 +48,7 @@ public class PlayerMovement : MonoBehaviour {
 			}
 
 			// Find target: Waypoint that is nearest to target position
-			float distFromTarget = ((Vector2)waypoint.transform.position - (Vector2)mouseClickPos).magnitude;
+			float distFromTarget = ((Vector2)waypoint.transform.position - (Vector2)targetPos).magnitude;
 			if (distFromTarget < nearestDistFromTarget) 
 			{
 				nearestDistFromTarget = distFromTarget;
@@ -136,14 +135,14 @@ public class PlayerMovement : MonoBehaviour {
 		GetComponent<Animator> ().SetInteger ("Direction", (int)Direction.None);
 	}
 
-	public void MoveToMouseClick()
+	public void MovePlayerTo(Vector2 targetCoords)
 	{
 		RoomController.instance.isPlayerMoving = true;
 
 		StopMoving ();
 		straightPaths.Clear ();
 		currentPathIndex = 0;
-		mouseClickPos = cameraObj.ScreenToWorldPoint(Input.mousePosition);
+		targetPos = targetCoords;
 
 		// Execute dijstra to return a stack of waypoints leading from playerPos to mousceClickPos
 		Stack<Waypoint> waypointStack = Dijkstra ();
