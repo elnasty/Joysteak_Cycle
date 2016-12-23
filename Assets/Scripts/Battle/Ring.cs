@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RingVineMovement : Projectile {
+public class Ring : Projectile {
 
 	//ringvine reads the path object children and goes to each one down the list
 	public GameObject pathObjParent;
@@ -40,14 +40,11 @@ public class RingVineMovement : Projectile {
 	void Update () 
 	{
 		//TODO: check if battle intro is done before moving
+		if (!BattleController.instance.isLevelReadyToStart)
+			return;
+		
 		MoveToNextPathObj ();
 	}
-
-	IEnumerator FadeInAndStart()
-	{
-		yield return null;
-	}
-
 
 	void MoveToNextPathObj ()
 	{

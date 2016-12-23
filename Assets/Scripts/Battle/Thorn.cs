@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ThornBehavior : Projectile
+public class Thorn : Projectile
 {
     private GameObject target;
 

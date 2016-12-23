@@ -17,6 +17,7 @@ public class BattleController : MonoBehaviour {
 	public GameObject BackgroundBack;
 	public GameObject Elliot;
 	public GameObject Heart;
+	public GameObject RingProjectile;
 
 	public bool isLevelReadyToStart = false;
 
@@ -91,6 +92,9 @@ public class BattleController : MonoBehaviour {
 //		Mem1.SetActive(false);
 //		Mem2.SetActive(false);
 //		Mem3.SetActive(false);
+
+
+		StartCoroutine(FadeIn(RingProjectile,5f,1f));
 	}
 
 	IEnumerator FadeIn(GameObject gameObj, float delay, float time)
@@ -99,7 +103,10 @@ public class BattleController : MonoBehaviour {
 		float opacity;
 
 		yield return new WaitForSeconds(delay);
-
+		if (!gameObj.activeSelf) 
+		{
+			gameObj.SetActive (true);
+		}
 		do
 		{
 			opacity = Mathf.Lerp(0f, 1f, currentTime / time);

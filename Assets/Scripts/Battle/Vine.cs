@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class VineBehavior1 : Projectile
+public class Vine : Projectile
 {
     // Use this for initialization
     void Start()
