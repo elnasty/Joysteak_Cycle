@@ -4,29 +4,49 @@ using UnityEngine;
 
 public class RoseBubbleBehaviour : MonoBehaviour {
 
-	public GameObject playerObj;
 	public float triggerRadius;
 	public float timerTriggerValue;
-	float timer;
 
-	// Use this for initialization
-	void Start () {
-		
+	private float timer;
+	private float initialColorVal;
+	private float currentColorVal;
+	private bool roseBudActivated;
+	private bool roseBudActivating;
+	private bool roseBudWilted;
+	private GameObject playerObj;
+	private SpriteRenderer sprite;
+
+	void Start () 
+	{
+		sprite = GetComponent<SpriteRenderer> ();
+		initialColorVal = sprite.color.r;
+		playerObj = BattleController.instance.Heart;
+		roseBudActivated = false;
 	}
 	
-	// Update is called once per frame
-	void Update () {
+	void Update () 
+	{
 		float distance = (transform.position - playerObj.transform.position).magnitude;
-		if (distance <= triggerRadius) 
-		{
-			timer += Time.deltaTime;
-			if (timer >= timerTriggerValue) 
-			{
-				Debug.Log ("Rose bud activated");
+		if (distance <= triggerRadius && !roseBudActivated && !roseBudWilted) {
+			if (timer >= timerTriggerValue) {
+				timer = 0;
+				roseBudActivated = true;
+				roseBudActivating = false;
+			} else {
+				roseBudActivating = true;
+				timer += Time.deltaTime;
+				currentColorVal = Mathf.Lerp (initialColorVal, 1, timer / timerTriggerValue);
+				sprite.color = new Color (currentColorVal, currentColorVal, currentColorVal);
 			}
-		} else 
-		{
-			timer = 0; //reset timer if no longer within range
+		}
+		if (distance > triggerRadius && roseBudActivating && !roseBudWilted) {
+			if (timer <= 0) {
+				roseBudActivated = false;
+			} else {
+				timer -= Time.deltaTime;
+				currentColorVal = Mathf.Lerp (initialColorVal, 1, timer / timerTriggerValue);
+				sprite.color = new Color (currentColorVal, currentColorVal, currentColorVal);
+			}
 		}
 	}
 }
