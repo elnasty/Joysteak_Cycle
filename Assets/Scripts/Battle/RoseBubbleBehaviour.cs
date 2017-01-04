@@ -9,6 +9,7 @@ public class RoseBubbleBehaviour : Projectile {
 	public float activateAfterTime;
 	public float wiltAfterTime;
 	public float wiltDuration;
+	public GameObject circle;
 
 	[Header("Movement Settings")]
 	public GameObject waypoint;
@@ -22,13 +23,15 @@ public class RoseBubbleBehaviour : Projectile {
 	private bool startWiltingInvoked;
 	private bool roseBudWilting;
 	private GameObject playerObj;
-	private SpriteRenderer sprite;
+	private SpriteRenderer flowerSprite;
+	private SpriteRenderer circleSprite;
 
 
 	void Start ()
 	{
-		sprite = GetComponent<SpriteRenderer> ();
-		initialColorVal = sprite.color.r;
+		flowerSprite = GetComponent<SpriteRenderer> ();
+		circleSprite = circle.GetComponent<SpriteRenderer> ();
+		initialColorVal = flowerSprite.color.r;
 		playerObj = BattleController.instance.Heart;
 		roseBudActivating = false;
 		roseBudActivated = false;
@@ -43,6 +46,9 @@ public class RoseBubbleBehaviour : Projectile {
 	void Update () 
 	{
 		ActivateOrWiltRose ();
+		
+		if (roseBudActivated)
+			base.heartEffectValue = base.heartEffectValue * -1;
 
 		// For spinning effect
 		transform.Rotate(0, 0, 50 * Time.deltaTime);
@@ -84,6 +90,7 @@ public class RoseBubbleBehaviour : Projectile {
 		roseBudActivated = true;
 		roseBudActivating = false;
 		transform.localScale = new Vector2 (1.1f, 1.1f);
+		circleSprite.color = new Color (1, 1, 0, 66/255f);
 	}
 
 
@@ -92,7 +99,7 @@ public class RoseBubbleBehaviour : Projectile {
 		roseBudActivating = true;
 		timer += Time.deltaTime;
 		currentColorVal = Mathf.Lerp (initialColorVal, 1, timer / activateAfterTime);
-		sprite.color = new Color (currentColorVal, currentColorVal, currentColorVal);
+		flowerSprite.color = new Color (currentColorVal, currentColorVal, currentColorVal);
 	}
 
 
@@ -107,7 +114,7 @@ public class RoseBubbleBehaviour : Projectile {
 	{
 		timer -= Time.deltaTime;
 		currentColorVal = Mathf.Lerp (initialColorVal, 1, timer / activateAfterTime);
-		sprite.color = new Color (currentColorVal, currentColorVal, currentColorVal);
+		flowerSprite.color = new Color (currentColorVal, currentColorVal, currentColorVal);
 	}
 
 
@@ -126,11 +133,13 @@ public class RoseBubbleBehaviour : Projectile {
 		{
 			timer += Time.fixedDeltaTime;
 			currentColorVal = Mathf.Lerp (initialColorVal, 0, timer / wiltDuration);
-			sprite.color = new Color (currentColorVal, currentColorVal, currentColorVal, currentColorVal);
+			flowerSprite.color = new Color (currentColorVal, currentColorVal, currentColorVal, currentColorVal);
+			circleSprite.color = new Color (currentColorVal, currentColorVal, currentColorVal, currentColorVal);
 			yield return new WaitForFixedUpdate();
 		}
 		roseBudWilting = false;
 		roseBudWilted = true;
+		gameObject.SetActive(false);
 	}
 
 
