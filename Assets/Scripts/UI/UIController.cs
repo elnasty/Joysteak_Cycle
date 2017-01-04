@@ -8,16 +8,14 @@ public class UIController : MonoBehaviour {
 
 	public static UIController instance;
 
-	[Header("Dialogue UI")]
 	public float letterPause = 0.1f;
 	public float textboxspeed;
 	public GameObject m_dialogueBox;
 	public GameObject m_dialogueText;
-	public TextAsset dialogueJSON;
+	public GameObject m_faceBox;
 	public AudioClip typeSound1;
 	public AudioClip typeSound2;
 	public enum Expression { Neutral, Happy, Sad, Angry, Surprised };
-
 	public bool isShowingDialogueBox = false;
 	private bool isTypingDialogue = false;
 	private bool isMovingDialogueBox = false;
@@ -29,36 +27,34 @@ public class UIController : MonoBehaviour {
 	void Awake()
 	{
 		if (instance == null) instance = this;
-		GameManager.instance.GetDialogueData (dialogueJSON.ToString());
-		currentDialogCollection = GameManager.instance.dialogueCatalog ["Event1"];
-
 	}
 
 
-	void Update()
+	public void ShowNextDialogue(DialogueCollection currentDialogCollection) 
 	{
-		if (Input.GetKeyDown(KeyCode.Z))
-		{	
-			if (isShowingDialogueBox)
+		this.currentDialogCollection = currentDialogCollection;
+
+		if (isShowingDialogueBox)
+		{
+			if (isTypingDialogue) 
 			{
-				if (isTypingDialogue) 
-				{
-					FastCompleteDialogue ();
-				} 
-				else
-				{
-					ShowNextDialogueInCurrentCollection ();
-					if (isCurrentDialogueCollectionCompleted)
-					{
-						MoveDialogueBox ();
-					}
-				}
-			}
+				FastCompleteDialogue ();
+			} 
 			else
 			{
-				MoveDialogueBox ();
 				ShowNextDialogueInCurrentCollection ();
+				if (isCurrentDialogueCollectionCompleted)
+				{
+					m_faceBox.SetActive (false);
+					MoveDialogueBox ();
+				}
 			}
+		}
+		else
+		{
+			m_faceBox.SetActive (true);
+			MoveDialogueBox ();
+			ShowNextDialogueInCurrentCollection ();
 		}
 	}
 
