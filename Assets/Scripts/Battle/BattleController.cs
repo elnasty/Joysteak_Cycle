@@ -17,12 +17,12 @@ public class BattleController : MonoBehaviour {
 	public GameObject BackgroundBack;
 	public GameObject Elliot;
 	public GameObject Heart;
-	public GameObject RingProjectile;
+	//public GameObject RingProjectile;
 
 	public bool isLevelReadyToStart = false;
 
 
-	public enum SpawnObjectEnum { thorn };
+	public enum SpawnObjectEnum { thorn, vine1 };
 	public List<List<GameObject>> pools = new List<List<GameObject>>();     //each list is an object pool for one
 	//type of object.
 
@@ -32,9 +32,6 @@ public class BattleController : MonoBehaviour {
 	public List<GameObject> objectPrefabs = new List<GameObject>();
 
 	[Header("Pause/Cutscene Options")]
-	public GameObject Mem1;
-	public GameObject Mem2;
-	public GameObject Mem3;
 
 	private bool isPaused = false;
 	private float PauseEndTime;
@@ -52,7 +49,8 @@ public class BattleController : MonoBehaviour {
 	}
 
 	// Use this for initialization
-	void Start () {
+	void Start ()
+    {
 		
 		InitialiseBattle ();
 		Heart.GetComponent<Heart> ().Initialise ();
@@ -89,12 +87,7 @@ public class BattleController : MonoBehaviour {
 		StartCoroutine(FadeIn(BackgroundBack, 3f, 1f));
 		StartCoroutine(FadeIn(Elliot, 4.5f, 1f));
 
-//		Mem1.SetActive(false);
-//		Mem2.SetActive(false);
-//		Mem3.SetActive(false);
-
-
-		StartCoroutine(FadeIn(RingProjectile,5f,1f));
+		//StartCoroutine(FadeIn(RingProjectile,5f,1f));
 	}
 
 	IEnumerator FadeIn(GameObject gameObj, float delay, float time)
@@ -134,19 +127,19 @@ public class BattleController : MonoBehaviour {
 
 		List<GameObject> pool = pools[typeIndex];
 
-		for (int i = 0; i < pool.Count; i++)
+        if (willGrow[typeIndex])
+        {
+            GameObject obj = (GameObject)Instantiate(objectPrefabs[typeIndex]);
+            obj.SetActive(false);
+            pool.Add(obj);
+        }
+
+        for (int i = 0; i < pool.Count; i++)
 		{
 			if (!pool[i].activeInHierarchy)
 			{
 				return pool[i];
 			}
-		}
-
-		if (willGrow[typeIndex])
-		{
-			GameObject obj = (GameObject)Instantiate(objectPrefabs[typeIndex]);
-			obj.SetActive(false);
-			pool.Add(obj);
 		}
 
 		return null;

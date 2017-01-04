@@ -4,22 +4,27 @@ using System.Collections;
 public class Vine : Projectile
 {
     // Use this for initialization
-    void Start()
+    void OnEnable()
     {
+        StartCoroutine(PierceOverTime(this.gameObject, 1f, 1f));
+        Invoke("Retract", 1.5f);
     }
 
-    // Update is called once per frame
-    void Update()
+    void Retract()
     {
-        if (Input.GetKeyDown(KeyCode.RightAlt))
-            StartCoroutine(PierceOverTime(this.gameObject, 1f, 1f));
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (gameObject.activeSelf)
         {
             StartCoroutine(PierceOverTime(this.gameObject, 0.1f, 1f));
-            Invoke("Fire", 0.25f);
             Invoke("Fire", 0.5f);
             Invoke("Fire", 0.75f);
+            Invoke("Fire", 0.875f);
+            Invoke("ReturnPool", 1f);
         }
+    }
+
+    void ReturnPool()
+    {
+        BattleController.instance.ReturnPooledObject(this.gameObject);
     }
 
     IEnumerator PierceOverTime(GameObject gameObj, float targetX, float time)
