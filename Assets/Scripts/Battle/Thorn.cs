@@ -9,6 +9,7 @@ public class Thorn : Projectile
     private float homingSensitivity = 0.05f;
     private bool clockwise;
     private bool fire = false;
+    private float lifeTime = 5f;
 
 	// Use this for initialization
 	void OnEnable ()
@@ -20,12 +21,14 @@ public class Thorn : Projectile
 
         if (clockwise) turnspeed = -turnspeed;
 
-        StartCoroutine(Spin(3f, turnspeed));
+        StartCoroutine(Spin(1f, turnspeed));
+        Invoke("ReturnPool", lifeTime);
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
+        // fire bool is in coroutine spin, only do tracking homing movement after the spin effect is done
 
         if (fire)
         {
@@ -51,6 +54,11 @@ public class Thorn : Projectile
 
             transform.Translate(Vector2.up * base.velocity * Time.deltaTime, Space.Self);
         }
+    }
+
+    void ReturnPool()
+    {
+        BattleController.instance.ReturnPooledObject(this.gameObject);
     }
 
     IEnumerator Spin(float time, float turnspeed)
