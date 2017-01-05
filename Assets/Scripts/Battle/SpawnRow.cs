@@ -2,18 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RowSpawn : MonoBehaviour
+public class SpawnRow : MonoBehaviour
 {
-    public int number;
-    public int delay;
-
-
-	// Use this for initialization
-	void Start ()
-    {
-	}
-	
-	// Update is called once per frame
 	void Update ()
     {
         if(Input.GetKeyDown(KeyCode.Space))

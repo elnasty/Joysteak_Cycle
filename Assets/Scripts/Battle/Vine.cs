@@ -3,10 +3,15 @@ using System.Collections;
 
 public class Vine : Projectile
 {
+    private float originalX;
+    public float targetXScale;
+    public bool ShootsThorns;
+
     // Use this for initialization
     void OnEnable()
     {
-        StartCoroutine(PierceOverTime(this.gameObject, 1f, 1f));
+        originalX = transform.localScale.x;
+        StartCoroutine(PierceOverTime(this.gameObject, targetXScale, 1f));
         Invoke("Retract", 1.5f);
     }
 
@@ -14,10 +19,13 @@ public class Vine : Projectile
     {
         if (gameObject.activeSelf)
         {
-            StartCoroutine(PierceOverTime(this.gameObject, 0.1f, 1f));
-            Invoke("Fire", 0.5f);
-            Invoke("Fire", 0.75f);
-            Invoke("Fire", 0.875f);
+            StartCoroutine(PierceOverTime(this.gameObject, originalX, 1f));
+            if (ShootsThorns)
+            {
+                Invoke("Fire", 0.5f);
+                Invoke("Fire", 0.75f);
+                Invoke("Fire", 0.875f);
+            }
             Invoke("ReturnPool", 1f);
         }
     }
@@ -41,7 +49,7 @@ public class Vine : Projectile
             lerpT = lerpT * lerpT * lerpT * lerpT;
 
             var newX = Mathf.Lerp(originalScale.x, targetX, lerpT);
-            gameObj.GetComponent<Transform>().localScale = new Vector3(newX, 1, 1);
+            gameObj.GetComponent<Transform>().localScale = new Vector3(newX, originalScale.y, 1);
 
             currentTime += Time.deltaTime;
             yield return null;
