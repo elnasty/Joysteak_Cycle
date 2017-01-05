@@ -11,8 +11,7 @@ public class Heart : MonoBehaviour
     public float acceleration;
     private float deceleration;
 	public float knockback;
-	bool isKnockedBack = false;
-	Rigidbody2D rgbody;
+	private bool isKnockedBack = false;
 
 	private int darkening = 0;
 	private int darkeningMax = 5;
@@ -22,13 +21,17 @@ public class Heart : MonoBehaviour
 	public int pulsingLevelReq;
 	public int levelPassReq;
 
+	private bool isHitBefore = false;
+	private bool isBeating = false;
+
 	public GameObject HeartBeat;
+
 
     void Start()
     {
         deceleration = -acceleration * 5;
-		rgbody = GetComponent<Rigidbody2D> ();
     }
+
 
 	public void Initialise()
 	{
@@ -36,28 +39,25 @@ public class Heart : MonoBehaviour
 		StartCoroutine(MoveTo(1f));
 	}
 
+
 	void OnCollisionEnter2D(Collision2D col)
 	{
-		//bounce heart back in the opposite direction
-		//KnockedBack();
 		speed = 0;
-
 	}
+
 
 	void Update()
 	{
 		// Darkening
-
 		colorFloat = (float)(darkeningMax - darkening) / (float)darkeningMax;
 
-		if(Input.GetMouseButtonDown(2))
+		if (isHitBefore && !isBeating) 
 		{
-			darkening = 0;
+			isBeating = true;
+			InvokeRepeating ("InvokeBeatCoroutine", 0f, 1f);
 		}
-
-		// Pulsing
-
 	}
+
 
 	IEnumerator MoveTo(float time)
 	{
@@ -78,6 +78,7 @@ public class Heart : MonoBehaviour
 		} while (currentTime <= time);
 	}
 
+
 	IEnumerator Blink(Transform transform, bool b00l)
 	{
 		float startTime = Time.timeSinceLevelLoad;
@@ -96,8 +97,8 @@ public class Heart : MonoBehaviour
 		transform.GetChild(0).GetComponent<Renderer>().enabled = true;
 	}
 
-	// Coroutine for 2 things, Pulsing and Pulsing Light
 
+	// Coroutine for 2 things, Pulsing and Pulsing Light
 	IEnumerator Beat(GameObject HeartBeat)
 	{
 		float scale;
@@ -108,12 +109,8 @@ public class Heart : MonoBehaviour
 		float time = 0.5f;
 		float currentTime = 0.0f;
 
-		float color;
-
 		do
 		{
-			color = Mathf.Lerp(1f, colorFloat, currentTime / (time * 2));
-
 			if (currentTime < time)
 			{
 				opacity = Mathf.Lerp(0f, 1f, currentTime / time);
@@ -135,20 +132,6 @@ public class Heart : MonoBehaviour
 
 		} while (currentTime <= time*2);
 	}
-
-//	void KnockedBack()
-//	{
-//		rgbody.velocity = (-direction*knockback);
-//		speed = 0;
-//		isKnockedBack = true;
-//
-//		Invoke ("EndKnockBack", 0.5f);
-//	}
-
-//	void EndKnockBack()
-//	{
-//		isKnockedBack = false;
-//	}
 
 
     // Update is called once per frame
@@ -181,22 +164,26 @@ public class Heart : MonoBehaviour
 
 		speed = Mathf.Clamp (speed, 0, speedMax);
 		GetComponent<Rigidbody2D>().MovePosition(GetComponent<Rigidbody2D>().position + speed * direction * Time.deltaTime);
-
-		//uncomment for keyboard movement scheme
-//		movex = Input.GetAxisRaw("Horizontal");
-//		movey = Input.GetAxisRaw("Vertical");
-//
-//		GetComponent<Rigidbody2D>().velocity = new Vector2(movex * movespeed, movey * movespeed);
-
-		
     }
+
 
 	public void HeartAffectHealth(int value)
 	{
-		if (darkening < darkeningMax && value > 0 || darkening > 0 && value < 0)
-		{
+		if (darkening < darkeningMax && value > 0 || darkening > 0 && value < 0) 
 			darkening += value;
-			StartCoroutine(Beat(HeartBeat));
+
+		// When player is taking damage
+		if (value > 0) 
+		{
+			if (!isHitBefore) isHitBefore = true;
+			InvokeBeatCoroutine ();
+			StartCoroutine (Blink (transform, false));
 		}
+	}
+
+
+	void InvokeBeatCoroutine()
+	{
+		StartCoroutine (Beat (HeartBeat));
 	}
 }
