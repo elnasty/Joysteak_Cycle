@@ -193,7 +193,7 @@ public class Heart : MonoBehaviour
 
 	public void HeartAffectHealth(int value)
 	{
-		if (darkening < darkeningMax)
+		if (darkening < darkeningMax && value > 0 || darkening > 0 && value < 0)
 		{
 			darkening += value;
 			StartCoroutine(Beat(HeartBeat));
