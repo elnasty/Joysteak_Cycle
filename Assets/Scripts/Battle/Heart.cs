@@ -22,7 +22,8 @@ public class Heart : MonoBehaviour
 	public int levelPassReq;
 
 	private bool isHitBefore = false;
-	private bool isBeating = false;
+	private float prevBeatRate = 10;
+	private float currentBeatRate = 10;
 
 	public GameObject HeartBeat;
 
@@ -51,10 +52,12 @@ public class Heart : MonoBehaviour
 		// Darkening
 		colorFloat = (float)(darkeningMax - darkening) / (float)darkeningMax;
 
-		if (isHitBefore && !isBeating) 
+		if (isHitBefore && currentBeatRate != prevBeatRate) 
 		{
-			isBeating = true;
-			InvokeRepeating ("InvokeBeatCoroutine", 0f, 1f);
+			Debug.Log (prevBeatRate);
+			prevBeatRate = currentBeatRate;
+			CancelInvoke ("InvokeBeatCoroutine");
+			InvokeRepeating ("InvokeBeatCoroutine", 0f, currentBeatRate);
 		}
 	}
 
@@ -178,6 +181,8 @@ public class Heart : MonoBehaviour
 			if (!isHitBefore) isHitBefore = true;
 			InvokeBeatCoroutine ();
 			StartCoroutine (Blink (transform, false));
+			currentBeatRate = currentBeatRate - 0.5f;
+			if (currentBeatRate <= 1) currentBeatRate = 1;
 		}
 	}
 
