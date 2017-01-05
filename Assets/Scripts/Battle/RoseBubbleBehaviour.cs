@@ -26,6 +26,9 @@ public class RoseBubbleBehaviour : Projectile {
 	private SpriteRenderer flowerSprite;
 	private SpriteRenderer circleSprite;
 
+	//TODO: Just for movement test. Movement could (should?) be determined by wave class?
+	private bool isMoving = false;
+
 
 	void Start ()
 	{
@@ -38,20 +41,32 @@ public class RoseBubbleBehaviour : Projectile {
 		roseBudWilted = false;
 		roseBudWilting = false;
 		startWiltingInvoked = false;
-
-		StartCoroutine (MoveStraightToPos (waypoint.transform.position));
 	}
 
 
 	void Update () 
 	{
-		ActivateOrWiltRose ();
+		if (BattleController.instance.isLevelReadyToStart && !isMoving) 
+		{	//TODO: Just for movement test. Movement could (should?) be determined by wave class?
+			isMoving = true;
+			StartCoroutine (MoveStraightToPos (waypoint.transform.position));
+		}
 		
-		if (roseBudActivated)
-			base.heartEffectValue = base.heartEffectValue * -1;
+		if (!BattleController.instance.isLevelReadyToStart) return;
+
+		if (!roseBudActivated) ActivateOrWiltRose ();
+		else DetectAndHealPlayer ();
 
 		// For spinning effect
 		transform.Rotate(0, 0, 50 * Time.deltaTime);
+	}
+
+
+	void DetectAndHealPlayer() 
+	{
+		if (base.heartEffectValue >= 0) base.heartEffectValue = base.heartEffectValue * -1;
+		float distance = (transform.position - playerObj.transform.position).magnitude;
+		if (distance <= triggerRadius) BattleController.instance.AffectPlayerHealth (base.heartEffectValue);
 	}
 
 
@@ -143,6 +158,7 @@ public class RoseBubbleBehaviour : Projectile {
 	}
 
 
+	//TODO: Just for movement test. Movement could (should?) be determined by wave class?
 	IEnumerator MoveStraightToPos(Vector3 target)
 	{
 		float step = base.velocity * Time.fixedDeltaTime;
