@@ -6,7 +6,7 @@ public class LookAtTest : MonoBehaviour
 {
     public Transform target;
     float angle;
-
+    
     void Update()
     {
         var newRotation = Quaternion.LookRotation(transform.position - target.position, transform.up);
@@ -16,7 +16,6 @@ public class LookAtTest : MonoBehaviour
 
         
         angle = Mathf.Atan2(transform.position.y - target.transform.position.y, transform.position.x - target.transform.position.x) * Mathf.Rad2Deg;
-        Debug.Log(transform.GetChild(0).GetComponent<Renderer>().bounds.size.y + transform.GetChild(1).GetComponent<Renderer>().bounds.size.y);
     }
     /*void Update()
     {
