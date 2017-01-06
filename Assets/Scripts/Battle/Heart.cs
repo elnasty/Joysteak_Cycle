@@ -218,6 +218,7 @@ public class Heart : MonoBehaviour
 			} else {
 				currentBeatTime = currentBeatTime - 0.1f;
 				StartCoroutine (BeatOverlay (8));
+				BattleController.instance.StartRippleEffect ();
 			}
 		}
 	}

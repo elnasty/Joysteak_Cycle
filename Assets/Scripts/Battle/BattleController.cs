@@ -13,6 +13,9 @@ public class BattleController : MonoBehaviour {
 
 	public static BattleController instance;
 
+	public GameObject cameraObj;
+	private RippleEffect ripple;
+
 	public GameObject BackgroundFront;
 	public GameObject BackgroundBack;
 	public GameObject Elliot;
@@ -45,7 +48,8 @@ public class BattleController : MonoBehaviour {
 		{
 			pools.Add(new List<GameObject>());
 		}
-		
+
+		ripple = cameraObj.GetComponent<RippleEffect> ();
 	}
 
 	// Use this for initialization
@@ -54,7 +58,6 @@ public class BattleController : MonoBehaviour {
 		
 		InitialiseBattle ();
 		Heart.GetComponent<Heart> ().Initialise ();
-
 
 		//populate pools
 		int i = 0;
@@ -69,11 +72,6 @@ public class BattleController : MonoBehaviour {
 			}
 			i++;
 		}
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
 	}
 
 	//InitialiseBattle //(mini-cutscenes, fade in bg and heart)
@@ -177,5 +175,11 @@ public class BattleController : MonoBehaviour {
 		yield return null;
 		TimedPause(3);
 		gameobject.SetActive(false);
+	}
+
+	public void StartRippleEffect()
+	{
+		ripple.shouldStartRipple = true;
+		ripple.ripplePosition = Heart.transform.position;
 	}
 }
