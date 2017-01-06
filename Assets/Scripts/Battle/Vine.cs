@@ -35,6 +35,12 @@ public class Vine : Projectile
         BattleController.instance.ReturnPooledObject(this.gameObject);
     }
 
+    public void SetTargetXScale(float value)
+    {
+        targetXScale = value;
+        return;
+    }
+
     IEnumerator PierceOverTime(GameObject gameObj, float targetX, float time)
     {
         Vector3 originalScale = GetComponent<Transform>().localScale;
