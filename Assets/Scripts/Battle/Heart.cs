@@ -22,11 +22,11 @@ public class Heart : MonoBehaviour
 	public int levelPassReq;
 
 	private bool isHitBefore = false;
-	private float prevBeatRate = 10;
-	private float currentBeatRate = 10;
+	private float prevBeatTime = 10;
+	private float currentBeatTime = 1f;
 
 	public GameObject HeartBeat;
-
+	public GameObject HeartOverlay;
 
     void Start()
     {
@@ -52,12 +52,12 @@ public class Heart : MonoBehaviour
 		// Darkening
 		colorFloat = (float)(darkeningMax - darkening) / (float)darkeningMax;
 
-		if (isHitBefore && currentBeatRate != prevBeatRate) 
+		// Faster pulsing
+		if (isHitBefore && currentBeatTime != prevBeatTime) 
 		{
-			Debug.Log (prevBeatRate);
-			prevBeatRate = currentBeatRate;
+			prevBeatTime = currentBeatTime;
 			CancelInvoke ("InvokeBeatCoroutine");
-			InvokeRepeating ("InvokeBeatCoroutine", 0f, currentBeatRate);
+			InvokeRepeating ("InvokeBeatCoroutine", 0f, currentBeatTime * 2);
 		}
 	}
 
@@ -101,15 +101,15 @@ public class Heart : MonoBehaviour
 	}
 
 
-	// Coroutine for 2 things, Pulsing and Pulsing Light
-	IEnumerator Beat(GameObject HeartBeat)
+	// Coroutine for 2 things, Pulsing Heart and Pulsing Light
+	IEnumerator Beat()
 	{
 		float scale;
 		float scaleStart = 0.3f;
 		float scaleEnd = 0.32f;
 
 		float opacity;
-		float time = 0.5f;
+		float time = currentBeatTime;
 		float currentTime = 0.0f;
 
 		do
@@ -134,6 +134,29 @@ public class Heart : MonoBehaviour
 			yield return null;
 
 		} while (currentTime <= time*2);
+	}
+
+
+	IEnumerator BeatOverlay(float maxScale)
+	{
+		float currentTime = 0f;
+		float endTime = 0.7f;
+		float initialAlpha = 0.2f;
+		SpriteRenderer heartOverlaySprite = HeartOverlay.GetComponent<SpriteRenderer> ();
+		heartOverlaySprite.color = new Vector4 (1, 1, 1, initialAlpha);
+
+		while (currentTime <= endTime)
+		{
+			currentTime += Time.fixedDeltaTime;
+			float currentAlpha = Mathf.Lerp (initialAlpha, 0, currentTime / endTime);
+			heartOverlaySprite.color = new Color (1, 1, 1, currentAlpha);
+			float scale = Mathf.Lerp (1, maxScale, currentTime / endTime);
+			HeartOverlay.transform.localScale = new Vector3 (scale, scale, 1);
+			yield return new WaitForFixedUpdate();
+		}
+
+		HeartOverlay.transform.localScale = new Vector3 (1, 1, 1);
+		heartOverlaySprite.color = new Vector4 (1, 1, 1, 0);
 	}
 
 
@@ -164,10 +187,19 @@ public class Heart : MonoBehaviour
                 speed = 0;
         }
 
-
 		speed = Mathf.Clamp (speed, 0, speedMax);
 		GetComponent<Rigidbody2D>().MovePosition(GetComponent<Rigidbody2D>().position + speed * direction * Time.deltaTime);
     }
+
+
+	// Testing function to move Casey by keyboard controls
+	void MoveByWASD()
+	{
+		float movex = Input.GetAxisRaw("Horizontal");
+		float movey = Input.GetAxisRaw("Vertical");
+		Vector2 movement = new Vector2 (movex, movey);
+		GetComponent<Rigidbody2D>().AddForce (movement * 500);
+	}
 
 
 	public void HeartAffectHealth(int value)
@@ -181,14 +213,18 @@ public class Heart : MonoBehaviour
 			if (!isHitBefore) isHitBefore = true;
 			InvokeBeatCoroutine ();
 			StartCoroutine (Blink (transform, false));
-			currentBeatRate = currentBeatRate - 0.5f;
-			if (currentBeatRate <= 1) currentBeatRate = 1;
+			if (currentBeatTime <= 0.1f) {
+				currentBeatTime = 0.1f;
+			} else {
+				currentBeatTime = currentBeatTime - 0.1f;
+				StartCoroutine (BeatOverlay (8));
+			}
 		}
 	}
 
 
 	void InvokeBeatCoroutine()
 	{
-		StartCoroutine (Beat (HeartBeat));
+		StartCoroutine (Beat ());
 	}
 }
