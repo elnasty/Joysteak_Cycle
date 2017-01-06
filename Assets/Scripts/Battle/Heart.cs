@@ -11,8 +11,7 @@ public class Heart : MonoBehaviour
     public float acceleration;
     private float deceleration;
 	public float knockback;
-	bool isKnockedBack = false;
-	Rigidbody2D rgbody;
+	private bool isKnockedBack = false;
 
 	private int darkening = 0;
 	private int darkeningMax = 5;
@@ -22,13 +21,18 @@ public class Heart : MonoBehaviour
 	public int pulsingLevelReq;
 	public int levelPassReq;
 
+	private bool isHitBefore = false;
+	private float prevBeatTime = 10;
+	private float currentBeatTime = 1f;
+
 	public GameObject HeartBeat;
+	public GameObject HeartOverlay;
 
     void Start()
     {
         deceleration = -acceleration * 5;
-		rgbody = GetComponent<Rigidbody2D> ();
     }
+
 
 	public void Initialise()
 	{
@@ -36,28 +40,27 @@ public class Heart : MonoBehaviour
 		StartCoroutine(MoveTo(1f));
 	}
 
+
 	void OnCollisionEnter2D(Collision2D col)
 	{
-		//bounce heart back in the opposite direction
-		//KnockedBack();
 		speed = 0;
-
 	}
+
 
 	void Update()
 	{
 		// Darkening
-
 		colorFloat = (float)(darkeningMax - darkening) / (float)darkeningMax;
 
-		if(Input.GetMouseButtonDown(2))
+		// Faster pulsing
+		if (isHitBefore && currentBeatTime != prevBeatTime) 
 		{
-			darkening = 0;
+			prevBeatTime = currentBeatTime;
+			CancelInvoke ("InvokeBeatCoroutine");
+			InvokeRepeating ("InvokeBeatCoroutine", 0f, currentBeatTime * 2);
 		}
-
-		// Pulsing
-
 	}
+
 
 	IEnumerator MoveTo(float time)
 	{
@@ -78,6 +81,7 @@ public class Heart : MonoBehaviour
 		} while (currentTime <= time);
 	}
 
+
 	IEnumerator Blink(Transform transform, bool b00l)
 	{
 		float startTime = Time.timeSinceLevelLoad;
@@ -96,24 +100,20 @@ public class Heart : MonoBehaviour
 		transform.GetChild(0).GetComponent<Renderer>().enabled = true;
 	}
 
-	// Coroutine for 2 things, Pulsing and Pulsing Light
 
-	IEnumerator Beat(GameObject HeartBeat)
+	// Coroutine for 2 things, Pulsing Heart and Pulsing Light
+	IEnumerator Beat()
 	{
 		float scale;
 		float scaleStart = 0.3f;
 		float scaleEnd = 0.32f;
 
 		float opacity;
-		float time = 0.5f;
+		float time = currentBeatTime;
 		float currentTime = 0.0f;
-
-		float color;
 
 		do
 		{
-			color = Mathf.Lerp(1f, colorFloat, currentTime / (time * 2));
-
 			if (currentTime < time)
 			{
 				opacity = Mathf.Lerp(0f, 1f, currentTime / time);
@@ -136,19 +136,28 @@ public class Heart : MonoBehaviour
 		} while (currentTime <= time*2);
 	}
 
-//	void KnockedBack()
-//	{
-//		rgbody.velocity = (-direction*knockback);
-//		speed = 0;
-//		isKnockedBack = true;
-//
-//		Invoke ("EndKnockBack", 0.5f);
-//	}
 
-//	void EndKnockBack()
-//	{
-//		isKnockedBack = false;
-//	}
+	IEnumerator BeatOverlay(float maxScale)
+	{
+		float currentTime = 0f;
+		float endTime = 0.7f;
+		float initialAlpha = 0.2f;
+		SpriteRenderer heartOverlaySprite = HeartOverlay.GetComponent<SpriteRenderer> ();
+		heartOverlaySprite.color = new Vector4 (1, 1, 1, initialAlpha);
+
+		while (currentTime <= endTime)
+		{
+			currentTime += Time.fixedDeltaTime;
+			float currentAlpha = Mathf.Lerp (initialAlpha, 0, currentTime / endTime);
+			heartOverlaySprite.color = new Color (1, 1, 1, currentAlpha);
+			float scale = Mathf.Lerp (1, maxScale, currentTime / endTime);
+			HeartOverlay.transform.localScale = new Vector3 (scale, scale, 1);
+			yield return new WaitForFixedUpdate();
+		}
+
+		HeartOverlay.transform.localScale = new Vector3 (1, 1, 1);
+		heartOverlaySprite.color = new Vector4 (1, 1, 1, 0);
+	}
 
 
     // Update is called once per frame
@@ -178,25 +187,45 @@ public class Heart : MonoBehaviour
                 speed = 0;
         }
 
-
 		speed = Mathf.Clamp (speed, 0, speedMax);
 		GetComponent<Rigidbody2D>().MovePosition(GetComponent<Rigidbody2D>().position + speed * direction * Time.deltaTime);
-
-		//uncomment for keyboard movement scheme
-//		movex = Input.GetAxisRaw("Horizontal");
-//		movey = Input.GetAxisRaw("Vertical");
-//
-//		GetComponent<Rigidbody2D>().velocity = new Vector2(movex * movespeed, movey * movespeed);
-
-		
     }
+
+
+	// Testing function to move Casey by keyboard controls
+	void MoveByWASD()
+	{
+		float movex = Input.GetAxisRaw("Horizontal");
+		float movey = Input.GetAxisRaw("Vertical");
+		Vector2 movement = new Vector2 (movex, movey);
+		GetComponent<Rigidbody2D>().AddForce (movement * 500);
+	}
+
 
 	public void HeartAffectHealth(int value)
 	{
-		if (darkening < darkeningMax && value > 0 || darkening > 0 && value < 0)
-		{
+		if (darkening < darkeningMax && value > 0 || darkening > 0 && value < 0) 
 			darkening += value;
-			StartCoroutine(Beat(HeartBeat));
+
+		// When player is taking damage
+		if (value > 0) 
+		{
+			if (!isHitBefore) isHitBefore = true;
+			InvokeBeatCoroutine ();
+			StartCoroutine (Blink (transform, false));
+			if (currentBeatTime <= 0.1f) {
+				currentBeatTime = 0.1f;
+			} else {
+				currentBeatTime = currentBeatTime - 0.1f;
+				StartCoroutine (BeatOverlay (8));
+				BattleController.instance.StartRippleEffect ();
+			}
 		}
+	}
+
+
+	void InvokeBeatCoroutine()
+	{
+		StartCoroutine (Beat ());
 	}
 }
