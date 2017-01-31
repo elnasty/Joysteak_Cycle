@@ -30,11 +30,6 @@ public class Vine : Projectile
         }
     }
 
-    void ReturnPool()
-    {
-        BattleController.instance.ReturnPooledObject(this.gameObject);
-    }
-
     public void SetTargetXScale(float value)
     {
         targetXScale = value;

@@ -11,7 +11,6 @@ public class Thorn : Projectile
     private bool fire = false;
     private float lifeTime = 5f;
 
-	// Use this for initialization
 	void OnEnable ()
     {
         target = GameObject.FindGameObjectWithTag("Player");
@@ -25,7 +24,6 @@ public class Thorn : Projectile
         Invoke("ReturnPool", lifeTime);
     }
 	
-	// Update is called once per frame
 	void Update ()
     {
         // fire bool is in coroutine spin, only do tracking homing movement after the spin effect is done
@@ -54,11 +52,6 @@ public class Thorn : Projectile
 
             transform.Translate(Vector2.up * base.velocity * Time.deltaTime, Space.Self);
         }
-    }
-
-    void ReturnPool()
-    {
-        BattleController.instance.ReturnPooledObject(this.gameObject);
     }
 
     IEnumerator Spin(float time, float turnspeed)

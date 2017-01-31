@@ -11,11 +11,7 @@ public class Barb : Projectile
     {
         Invoke("ReturnPool", lifeTime);
     }
-
-    void ReturnPool()
-    {
-        BattleController.instance.ReturnPooledObject(this.gameObject);
-    }
+		
     // Update is called once per frame
     void Update ()
     {

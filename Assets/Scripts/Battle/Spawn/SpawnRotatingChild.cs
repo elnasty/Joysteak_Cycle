@@ -6,13 +6,7 @@ public class SpawnRotatingChild : MonoBehaviour
 {
     private float delay = 0.5f;
     private float time = 0.0f;
-	// Use this for initialization
-	void Start ()
-    {
-		
-	}
 	
-	// Update is called once per frame
 	void Update ()
     {
 		foreach (Transform child in transform)

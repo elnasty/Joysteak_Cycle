@@ -145,8 +145,11 @@ public class BattleController : MonoBehaviour {
 
 	public void ReturnPooledObject(GameObject obj)
 	{
-		obj.transform.position = this.transform.position;
-		obj.SetActive (false);
+		if (this != null) 
+		{
+			obj.transform.position = this.transform.position;
+			obj.SetActive (false);
+		}
 	}
 
 	/// <summary>

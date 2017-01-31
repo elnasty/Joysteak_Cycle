@@ -22,4 +22,15 @@ public class Projectile : MonoBehaviour {
 
 		}
 	}
+
+	void ReturnPool()
+	{
+		BattleController.instance.ReturnPooledObject(this.gameObject);
+		CancelInvoke ();
+	}
+
+	void OnBecameInvisible() 
+	{
+		ReturnPool ();
+	}
 }
