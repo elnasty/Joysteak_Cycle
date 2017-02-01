@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpawnStraightCorridor : MonoBehaviour 
-{
+public class SpawnDiagonalCorridor : MonoBehaviour {
+	
 	public float delay;
-	public float corridorLength;
+	public int corridorWidth;
 
 	private float time = 0.0f;
 	private int rowNumber = 0;
-	private int noChildSpawnIndex = 0;
+	private int noChildSpawnIndex = 5;
 
 	void Update ()
 	{
@@ -18,22 +18,17 @@ public class SpawnStraightCorridor : MonoBehaviour
 		{
 			time = 0.0f;
 			rowNumber++;
-
-			if (rowNumber % corridorLength != 0) 
+			noChildSpawnIndex = rowNumber % transform.childCount;
+			bool isEvenSegment = (rowNumber / transform.childCount) % 2 == 0;
+			if (isEvenSegment) noChildSpawnIndex = transform.childCount - noChildSpawnIndex;
+			for (int i = 0; i < transform.childCount; i++) 
 			{
-				for (int i = 0; i < transform.childCount; i++) 
-				{
-					if (i != noChildSpawnIndex && i != noChildSpawnIndex + 1) 
-					{
-						Transform child = transform.GetChild (i);
-						Fire (child);
-					}
+				bool isWithinEmptyArea = i < noChildSpawnIndex + corridorWidth && i > noChildSpawnIndex - corridorWidth + 1;
+				if (!isWithinEmptyArea) {
+					Transform child = transform.GetChild (i);
+					Fire (child);
 				}
 			} 
-			else 
-			{
-				noChildSpawnIndex = Random.Range (1, transform.childCount-1);
-			}
 		}
 	}
 
@@ -48,5 +43,4 @@ public class SpawnStraightCorridor : MonoBehaviour
 		barb.transform.eulerAngles = new Vector3(0, 0, angle);
 		barb.SetActive(true);
 	}
-
 }
