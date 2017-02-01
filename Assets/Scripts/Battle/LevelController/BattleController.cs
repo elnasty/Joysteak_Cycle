@@ -125,19 +125,20 @@ public class BattleController : MonoBehaviour {
 
 		List<GameObject> pool = pools[typeIndex];
 
-        if (willGrow[typeIndex])
-        {
-            GameObject obj = (GameObject)Instantiate(objectPrefabs[typeIndex]);
-            obj.SetActive(false);
-            pool.Add(obj);
-        }
-
         for (int i = 0; i < pool.Count; i++)
 		{
 			if (!pool[i].activeInHierarchy)
 			{
 				return pool[i];
 			}
+		}
+
+		if (willGrow[typeIndex])
+		{
+			GameObject obj = (GameObject)Instantiate(objectPrefabs[typeIndex]);
+			obj.SetActive(false);
+			pool.Add(obj);
+			return obj;
 		}
 
 		return null;

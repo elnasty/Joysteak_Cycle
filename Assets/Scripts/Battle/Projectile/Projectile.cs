@@ -8,7 +8,7 @@ public class Projectile : MonoBehaviour {
 	public bool isDestroyOnImpact;
 	public float velocity;
 
-	void OnCollisionEnter2D(Collision2D other)
+	void OnTriggerEnter2D(Collider2D other)
 	{
 		if (other.gameObject.tag == "Player") 
 		{
@@ -19,7 +19,6 @@ public class Projectile : MonoBehaviour {
 			{
 				BattleController.instance.ReturnPooledObject(this.gameObject);
 			}
-
 		}
 	}
 
