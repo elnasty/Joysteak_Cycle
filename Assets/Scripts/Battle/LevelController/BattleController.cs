@@ -23,7 +23,7 @@ public class BattleController : MonoBehaviour {
 	//public GameObject RingProjectile;
 
 	public bool isLevelReadyToStart = false;
-
+	public bool isPlayerInvulnerable = false;
 
 	public enum SpawnObjectEnum { thorn, vine1, vine2, barb };
 	public List<List<GameObject>> pools = new List<List<GameObject>>();     //each list is an object pool for one

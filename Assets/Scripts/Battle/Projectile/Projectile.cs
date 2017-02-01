@@ -10,7 +10,7 @@ public class Projectile : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D other)
 	{
-		if (other.gameObject.tag == "Player") 
+		if (other.gameObject.tag == "Player" && !BattleController.instance.isPlayerInvulnerable) 
 		{
 			//hurt/heal player accordingly
 			BattleController.instance.AffectPlayerHealth(heartEffectValue);

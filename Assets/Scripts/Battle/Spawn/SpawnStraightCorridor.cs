@@ -9,7 +9,7 @@ public class SpawnStraightCorridor : MonoBehaviour
 
 	private float time = 0.0f;
 	private int rowNumber = 0;
-	private int noChildSpawnIndex = 0;
+	private int noChildSpawnIndex = 5;
 
 	void Update ()
 	{
