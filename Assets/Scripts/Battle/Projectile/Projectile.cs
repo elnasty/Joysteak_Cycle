@@ -22,6 +22,20 @@ public class Projectile : MonoBehaviour {
 		}
 	}
 
+	void OnCollisionEnter2D(Collision2D other)
+	{
+		if (other.gameObject.tag == "Player" && !BattleController.instance.isPlayerInvulnerable) 
+		{
+			//hurt/heal player accordingly
+			BattleController.instance.AffectPlayerHealth(heartEffectValue);
+
+			if (isDestroyOnImpact) 
+			{
+				BattleController.instance.ReturnPooledObject(this.gameObject);
+			}
+		}
+	}
+
 	void ReturnPool()
 	{
 		BattleController.instance.ReturnPooledObject(this.gameObject);
