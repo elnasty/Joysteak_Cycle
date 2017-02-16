@@ -55,7 +55,6 @@ public class BattleController : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-		
 		InitialiseBattle ();
 		Heart.GetComponent<Heart> ().Initialise ();
 
