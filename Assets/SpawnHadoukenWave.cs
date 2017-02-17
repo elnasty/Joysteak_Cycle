@@ -28,7 +28,7 @@ public class SpawnHadoukenWave : MonoBehaviour {
 				}
 				rowNumber++;
 				velocity -= diff;
-				diff += 0.1f;
+				diff += 0.05f;
 			}
 		}
 	}
