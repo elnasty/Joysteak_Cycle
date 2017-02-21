@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpawnHadoukenWave : MonoBehaviour {
-
+public class SpawnHadoukenWave : MonoBehaviour 
+{
 	private bool startFiring = false;
 	private float diff = 0.01f;
 	private int rowNumber = 0;
@@ -12,15 +12,12 @@ public class SpawnHadoukenWave : MonoBehaviour {
 
 	void OnEnable() 
 	{
-//		startFiring = true;
+		startFiring = true;
 	}
 
 	void Update ()
 	{
-		if (Input.GetKeyDown (KeyCode.Space)) {
-			startFiring = true;
-		}
-		if (startFiring == true) {
+		if (startFiring == true && BattleController.instance.isLevelReadyToStart) {
 			if (rowNumber <= corridorLength && velocity > 5) {
 				for (int i = 0; i < transform.childCount; i++) {
 					Transform child = transform.GetChild (i);

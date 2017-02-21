@@ -14,7 +14,7 @@ public class SpawnStraightCorridor : MonoBehaviour
 	void Update ()
 	{
 		time += Time.deltaTime;
-		if (time > delay)
+		if (time > delay && BattleController.instance.isLevelReadyToStart)
 		{
 			time = 0.0f;
 			rowNumber++;

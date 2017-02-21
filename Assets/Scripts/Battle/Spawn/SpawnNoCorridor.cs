@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpawnNoCorridor : MonoBehaviour {
-
+public class SpawnNoCorridor : MonoBehaviour 
+{
 	public float delay;
 	public float corridorLength;
 
@@ -13,7 +13,7 @@ public class SpawnNoCorridor : MonoBehaviour {
 	void Update ()
 	{
 		time += Time.deltaTime;
-		if (time > delay)
+		if (time > delay && BattleController.instance.isLevelReadyToStart)
 		{
 			time = 0.0f;
 			rowNumber++;
