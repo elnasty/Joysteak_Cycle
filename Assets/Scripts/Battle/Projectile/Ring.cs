@@ -10,7 +10,6 @@ public class Ring : Projectile {
 	int index = 0;
 
 	List<GameObject> pathObjList = new List<GameObject>();
-	Rigidbody2D rgbody;
 
 	// Use this for initialization
 	void Start () 
@@ -30,10 +29,6 @@ public class Ring : Projectile {
 		}
 
 		base.isDestroyOnImpact = false;
-
-
-		rgbody = GetComponent<Rigidbody2D> ();
-
 	}
 	
 	// Update is called once per frame
@@ -52,12 +47,10 @@ public class Ring : Projectile {
 		{
 			GameObject pathObj = pathObjList [index];
 			float distToPoint = ((transform.position - pathObj.transform.position).magnitude);
-			Vector2 direction = pathObj.transform.position - transform.position;
 			if (distToPoint > 0) 
 			{
 				canMoveToNext = false;
 				distToPoint = ((transform.position - pathObj.transform.position).magnitude);
-				direction = pathObj.transform.position - transform.position;
 				transform.position = Vector2.MoveTowards (transform.position, pathObj.transform.position, base.velocity * Time.deltaTime);
 				if (distToPoint <= 0.05f) 
 				{

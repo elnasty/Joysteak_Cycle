@@ -11,33 +11,29 @@ public class BattleController : MonoBehaviour {
 	/// Listens to player (heart) and projectiles 
 	/// </summary>
 
+	[Header("Basic/Player Options")]
 	public static BattleController instance;
-
 	public GameObject cameraObj;
-	private RippleEffect ripple;
-
 	public GameObject BackgroundFront;
 	public GameObject BackgroundBack;
 	public GameObject Elliot;
 	public GameObject Heart;
-	//public GameObject RingProjectile;
-
-	public bool isLevelReadyToStart = false;
 	public bool isPlayerInvulnerable = false;
-
-	public enum SpawnObjectEnum { thorn, vine1, vine2, barb };
-	public List<List<GameObject>> pools = new List<List<GameObject>>();     //each list is an object pool for one
-	//type of object.
 
 	[Header("Pool Options")]
 	public List<int> poolSizes;     //the size of each object pool.
 	public List<bool> willGrow;     //whether or not the pools will grow to accomodate increasing demand for the object.
 	public List<GameObject> objectPrefabs = new List<GameObject>();
+	public List<List<GameObject>> pools = new List<List<GameObject>>(); //each list is an object pool for type of object.
+	public enum SpawnObjectEnum { thorn, vine1, vine2, barb };
 
 	[Header("Pause/Cutscene Options")]
-
-	private bool isPaused = false;
+	public bool isLevelReadyToStart = false;
 	private float PauseEndTime;
+
+	[Header("Special Effects Options")]
+	public ParticleSystem bulletDisintegrate;
+	private RippleEffect ripple;
 
 	void Awake()
 	{
@@ -172,6 +168,33 @@ public class BattleController : MonoBehaviour {
 		Time.timeScale = 1;
 	}
 
+	void Update() 
+	{
+		if (Input.GetKeyDown (KeyCode.Space)) 
+		{
+			DestroyAllProjectilesWithEffect (bulletDisintegrate);
+		}
+	}
+
+	void DestroyAllProjectilesWithEffect(ParticleSystem vfx) 
+	{
+		GameObject[] projectiles = GameObject.FindGameObjectsWithTag ("Projectile");
+		foreach (GameObject projectile in projectiles) {
+			MakeParticleEffect (vfx, projectile.transform.position);
+			projectile.GetComponent<Projectile> ().ReturnPool ();
+			isLevelReadyToStart = false;
+		}
+	}
+
+	ParticleSystem MakeParticleEffect(ParticleSystem vfx, Vector3 position) 
+	{
+		ParticleSystem effect = Instantiate(vfx) as ParticleSystem;
+		effect.transform.position = position;
+		Destroy(effect.gameObject, effect.main.startLifetime.constant);
+		return effect;
+	}
+
+	//TODO: What is this for?
 	private IEnumerator Slideshow(GameObject gameobject)
 	{
 		gameobject.SetActive(true);

@@ -36,7 +36,7 @@ public class Projectile : MonoBehaviour {
 		}
 	}
 
-	void ReturnPool()
+	public void ReturnPool()
 	{
 		BattleController.instance.ReturnPooledObject(this.gameObject);
 		CancelInvoke ();
