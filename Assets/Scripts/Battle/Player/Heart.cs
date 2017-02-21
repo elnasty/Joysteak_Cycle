@@ -221,6 +221,9 @@ public class Heart : MonoBehaviour
 				BattleController.instance.StartRippleEffect ();
 			}
 		}
+
+		if (darkening >= darkeningMax)
+			BattleController.instance.ExecutePlayerDeathSequence ();
 	}
 
 

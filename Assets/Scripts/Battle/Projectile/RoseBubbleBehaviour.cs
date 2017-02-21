@@ -35,7 +35,7 @@ public class RoseBubbleBehaviour : Projectile {
 		flowerSprite = GetComponent<SpriteRenderer> ();
 		circleSprite = circle.GetComponent<SpriteRenderer> ();
 		initialColorVal = flowerSprite.color.r;
-		playerObj = BattleController.instance.Heart;
+		playerObj = BattleController.instance.heart;
 		roseBudActivating = false;
 		roseBudActivated = false;
 		roseBudWilted = false;

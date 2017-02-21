@@ -14,10 +14,10 @@ public class BattleController : MonoBehaviour {
 	[Header("Basic/Player Options")]
 	public static BattleController instance;
 	public GameObject cameraObj;
-	public GameObject BackgroundFront;
-	public GameObject BackgroundBack;
-	public GameObject Elliot;
-	public GameObject Heart;
+	public GameObject backgroundFront;
+	public GameObject backgroundBack;
+	public GameObject elliot;
+	public GameObject heart;
 	public bool isPlayerInvulnerable = false;
 
 	[Header("Pool Options")]
@@ -41,22 +41,20 @@ public class BattleController : MonoBehaviour {
 			instance = this;
 
 		for (int i = 0; i < Enum.GetNames(typeof(SpawnObjectEnum)).GetLength(0); i++)
-		{
 			pools.Add(new List<GameObject>());
-		}
 
 		ripple = cameraObj.GetComponent<RippleEffect> ();
 	}
 
-	// Use this for initialization
 	void Start ()
     {
-		InitialiseBattle ();
-		Heart.GetComponent<Heart> ().Initialise ();
+		heart.GetComponent<Heart> ().Initialise ();
+		PopulatePools ();
+	}
 
-		//populate pools
+	void PopulatePools() 
+	{
 		int i = 0;
-
 		foreach (List<GameObject> pool in pools)
 		{
 			for (int j = 0; j < poolSizes[i]; ++j)
@@ -69,49 +67,9 @@ public class BattleController : MonoBehaviour {
 		}
 	}
 
-	//InitialiseBattle //(mini-cutscenes, fade in bg and heart)
-	void InitialiseBattle()
-	{
-		BackgroundFront.GetComponent<SpriteRenderer>().color = new Vector4(1, 1, 1, 0);
-		BackgroundBack.GetComponent<SpriteRenderer>().color = new Vector4(1, 1, 1, 0);
-		//Cursor.visible = false;
-
-		StartCoroutine(FadeIn(BackgroundFront, 2f, 1f));
-		StartCoroutine(FadeIn(BackgroundBack, 3f, 1f));
-		StartCoroutine(FadeIn(Elliot, 4.5f, 1f));
-
-		//StartCoroutine(FadeIn(RingProjectile,5f,1f));
-	}
-
-	IEnumerator FadeIn(GameObject gameObj, float delay, float time)
-	{
-		float currentTime = 0.0f;
-		float opacity;
-
-		yield return new WaitForSeconds(delay);
-		if (!gameObj.activeSelf) 
-		{
-			gameObj.SetActive (true);
-		}
-		do
-		{
-			opacity = Mathf.Lerp(0f, 1f, currentTime / time);
-			gameObj.GetComponent<SpriteRenderer>().color = new Vector4(1, 1, 1, opacity);
-			currentTime += Time.deltaTime;
-			yield return null;
-		} while (currentTime <= time);
-
-		if (gameObj.Equals (Elliot)) 
-		{
-			Debug.Log ("Ready");
-			isLevelReadyToStart = true; //true after the level loads and mini-cutscene at the start is done, 
-			//controls whether the actual battle can start or not
-		}
-	}
-
 	public void AffectPlayerHealth(int value)
 	{
-		Heart.GetComponent<Heart> ().HeartAffectHealth (value);
+		heart.GetComponent<Heart> ().HeartAffectHealth (value);
 	}
 
 	public GameObject GetPooledObject(SpawnObjectEnum objType)
@@ -147,10 +105,7 @@ public class BattleController : MonoBehaviour {
 			obj.SetActive (false);
 		}
 	}
-
-	/// <summary>
-	/// Pause methods
-	/// </summary>
+		
 	public void TimedPause(float delay)
 	{
 		Time.timeScale = 0;
@@ -167,13 +122,11 @@ public class BattleController : MonoBehaviour {
 	{
 		Time.timeScale = 1;
 	}
-
-	void Update() 
+		
+	public void ExecutePlayerDeathSequence()
 	{
-		if (Input.GetKeyDown (KeyCode.Space)) 
-		{
-			DestroyAllProjectilesWithEffect (bulletDisintegrate);
-		}
+		DestroyAllProjectilesWithEffect (bulletDisintegrate);
+		isLevelReadyToStart = false;
 	}
 
 	void DestroyAllProjectilesWithEffect(ParticleSystem vfx) 
@@ -206,6 +159,6 @@ public class BattleController : MonoBehaviour {
 	public void StartRippleEffect()
 	{
 		ripple.shouldStartRipple = true;
-		ripple.ripplePosition = Heart.transform.position;
+		ripple.ripplePosition = heart.transform.position;
 	}
 }
