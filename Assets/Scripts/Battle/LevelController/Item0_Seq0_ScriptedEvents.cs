@@ -67,7 +67,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		{
 			currentDarkening = heart.darkening;
 			StopAllCoroutines ();
-			StartCoroutine (MoveElliot (elliotEndPos, elliotFastSpeed * 2));
+			StartCoroutine (MoveElliot (elliotEndPos, elliotFastSpeed * 4));
 			isElliotMovingIn = true;
 			Debug.Log ("Item0 Seq0 Level Ending, Event Start");
 		}
