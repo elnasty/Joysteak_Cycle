@@ -13,8 +13,8 @@ public class Heart : MonoBehaviour
 	public float knockback;
 	private bool isKnockedBack = false;
 
-	private int darkening = 0;
-	private int darkeningMax = 5;
+	public int darkening = 0;
+	public int darkeningMax = 5;
 	private float colorFloat;
 
 	private int pulsingLevel;
@@ -22,7 +22,7 @@ public class Heart : MonoBehaviour
 	public int levelPassReq;
 
 	private bool isHitBefore = false;
-	private float prevBeatTime = 10;
+	private float prevBeatTime = 1f;
 	private float currentBeatTime = 1f;
 
 	public GameObject HeartBeat;
