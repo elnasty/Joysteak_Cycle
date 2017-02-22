@@ -147,7 +147,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		{
 			if (waveNo != 0) 
 			{
-				nextCameraRotAngle += 90;
+				nextCameraRotAngle = nextCameraRotAngle + 90;
 				StartCoroutine (RotateCamera ());
 			}
 
@@ -230,10 +230,13 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 
 	IEnumerator RotateCamera()
 	{
-		while(Camera.main.transform.rotation.eulerAngles.z < nextCameraRotAngle)
+		while (Camera.main.transform.eulerAngles.z < nextCameraRotAngle - 1) 
 		{
-			Camera.main.transform.Rotate(0, 0, 50 * Time.deltaTime);
+			Camera.main.transform.Rotate (0, 0, 50 * Time.deltaTime);
 			yield return null;
 		}
+		nextCameraRotAngle = nextCameraRotAngle == 360 ? 0 : nextCameraRotAngle;
+		Camera.main.transform.eulerAngles = new Vector3(0, 0, nextCameraRotAngle);
+
 	}
 }
