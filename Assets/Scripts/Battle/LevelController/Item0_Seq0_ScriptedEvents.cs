@@ -30,6 +30,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	float startTime;
 	float currentDarkening = 0f;
 	int waveNo = 0;
+	int nextCameraRotAngle = 0;
 
 	bool shouldBgScroll = false;
 	bool isMovingElliot = false;
@@ -62,18 +63,40 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 
 	void Update() 
 	{
-		if (!BattleController.instance.isLevelReadyToStart) 
-		{
-			shouldBgScroll = false;
-		}
+		ElliotSeqMovement ();
+		ScrollBackground ();
+		if (shouldStartSequence ()) StartSequence0 ();
+		if (isPlayerDead ()) StartEndingEvent ();
+	}
 
-		if (shouldBgScroll == true) 
-		{
-			float newPosition = Mathf.Repeat ((Time.time - startTime) * scrollSpeed, bgWidth);
-			firstBg.transform.position = firstBgStartPos + Vector2.left * newPosition;
-			secondBg.transform.position = secondBgStartPos + Vector2.left * newPosition;
-		}
-			
+	bool shouldStartSequence()
+	{
+		return BattleController.instance.isLevelReadyToStart && !isSequenceStarted;
+	}
+
+	bool isPlayerDead()
+	{
+		return !BattleController.instance.isLevelReadyToStart && isSequenceStarted;
+	}
+
+	void StartSequence0()
+	{
+		isSequenceStarted = true;
+		InvokeRepeating ("ExecuteNextSpawnType", 0, 10);
+	}
+
+	void StartEndingEvent()
+	{
+		CancelInvoke ();
+		StopAllCoroutines ();
+		horizontalSpawn.enabled = false;
+		diagonalSpawn.enabled = false;
+		noCorridorSpawn.enabled = false;
+		hadoukenSpawn.enabled = false;
+	}
+
+	void ElliotSeqMovement()
+	{
 		// Elliot follows a basic movement pattern of moving in and out of screen
 		if (!isMovingElliot && BattleController.instance.isLevelReadyToStart) 
 		{
@@ -85,23 +108,29 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 				isElliotMovingIn = true;
 			}
 		}
-
 		// If player is hit, move Elliot out of screen quickly
 		if (currentDarkening < heart.darkening || currentDarkening >= heart.darkeningMax && BattleController.instance.isLevelReadyToStart) 
 		{
 			currentDarkening = heart.darkening;
-			StopAllCoroutines ();
+			StopCoroutine (MoveElliot (new Vector2 (), 0));
 			StartCoroutine (MoveElliot (elliotEndPos, elliotFastSpeed * 4));
 			isElliotMovingIn = true;
-			Debug.Log ("Item0 Seq0 Level Ending, Event Start");
 		}
-			
-		if (BattleController.instance.isLevelReadyToStart && !isSequenceStarted) 
+	}
+
+	void ScrollBackground()
+	{
+		if (!BattleController.instance.isLevelReadyToStart) 
 		{
-			isSequenceStarted = true;
-			InvokeRepeating ("ExecuteNextSpawnType", 0, 10);
+			shouldBgScroll = false;
 		}
 
+		if (shouldBgScroll == true) 
+		{
+			float newPosition = Mathf.Repeat ((Time.time - startTime) * scrollSpeed, bgWidth);
+			firstBg.transform.position = firstBgStartPos + Vector2.left * newPosition;
+			secondBg.transform.position = secondBgStartPos + Vector2.left * newPosition;
+		}
 	}
 
 	void ExecuteNextSpawnType()
@@ -116,6 +145,12 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		} 
 		else 
 		{
+			if (waveNo != 0) 
+			{
+				nextCameraRotAngle += 90;
+				StartCoroutine (RotateCamera ());
+			}
+
 			int spawnType = waveNo % 3;
 			switch (spawnType) 
 			{
@@ -191,5 +226,14 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 			yield return null;
 		}
 		isMovingElliot = false;
+	}
+
+	IEnumerator RotateCamera()
+	{
+		while(Camera.main.transform.rotation.eulerAngles.z < nextCameraRotAngle)
+		{
+			Camera.main.transform.Rotate(0, 0, 50 * Time.deltaTime);
+			yield return null;
+		}
 	}
 }
