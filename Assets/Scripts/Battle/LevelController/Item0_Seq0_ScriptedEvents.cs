@@ -232,11 +232,14 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	{
 		while (Camera.main.transform.eulerAngles.z < nextCameraRotAngle - 1) 
 		{
+			heart.transform.Rotate (0, 0, 85 * Time.deltaTime);
+			elliot.transform.Rotate (0, 0, 50 * Time.deltaTime);
 			Camera.main.transform.Rotate (0, 0, 50 * Time.deltaTime);
 			yield return null;
 		}
 		nextCameraRotAngle = nextCameraRotAngle == 360 ? 0 : nextCameraRotAngle;
+		heart.transform.eulerAngles = new Vector3(0, 0, nextCameraRotAngle);
+		elliot.transform.eulerAngles = new Vector3(0, 0, nextCameraRotAngle);
 		Camera.main.transform.eulerAngles = new Vector3(0, 0, nextCameraRotAngle);
-
 	}
 }
