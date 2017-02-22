@@ -5,35 +5,58 @@ using UnityEngine;
 public class Item0_Seq0_ScriptedEvents : MonoBehaviour 
 {
 	Heart heart;
+
 	GameObject firstBg;
 	GameObject secondBg;
 	GameObject elliot;
+
+	SpawnStraightCorridor horizontalSpawn;
+	SpawnDiagonalCorridor diagonalSpawn;
+	SpawnNoCorridor noCorridorSpawn;
+	SpawnHadoukenWave hadoukenSpawn;
+
 	Vector2 firstBgStartPos;
 	Vector2 secondBgStartPos;
 	Vector2 elliotEndPos;
 	Vector2 elliotStartPos;
+
+	public float scrollSpeed = 4;
+	public float bulletSpeed = 5;
+	public float bulletMaxSpeed = 20;
+	public float elliotFastSpeed = 1.3f;
+	public float elliotSlowSpeed = 0.3f;
+
 	float bgWidth;
 	float startTime;
-	float scrollSpeed = 4;
-	float elliotFastSpeed = 1.3f;
-	float elliotSlowSpeed = 0.3f;
 	float currentDarkening = 0f;
+	int waveNo = 0;
+
 	bool shouldBgScroll = false;
 	bool isMovingElliot = false;
 	bool isElliotMovingIn = true;
+	bool isSequenceStarted = false;
 
 	void Start () 
 	{
 		heart = BattleController.instance.heart.transform.GetComponent<Heart> ();
+
 		elliot = BattleController.instance.elliot;
 		elliotStartPos = elliot.transform.position;
 		elliotEndPos = (Vector2) elliot.transform.position + new Vector2 (10, 0);
+
+		GameObject corridorSpawn = elliot.transform.FindChild ("CorridorSpawn").gameObject; //Gameobject is specific only to this sequence
+		horizontalSpawn = corridorSpawn.transform.GetComponent<SpawnStraightCorridor> ();
+		diagonalSpawn = corridorSpawn.transform.GetComponent<SpawnDiagonalCorridor> ();
+		noCorridorSpawn = corridorSpawn.transform.GetComponent<SpawnNoCorridor> ();
+		hadoukenSpawn = corridorSpawn.transform.GetComponent<SpawnHadoukenWave> ();
+
 		firstBg = BattleController.instance.backgroundFront;
 		bgWidth = firstBg.transform.GetComponent<SpriteRenderer> ().bounds.size.x;
 		firstBgStartPos = firstBg.transform.position;
 		secondBg = GameObject.Instantiate (firstBg);
 		secondBg.transform.position = new Vector2 (bgWidth + firstBgStartPos.x, firstBgStartPos.y);
 		secondBgStartPos = secondBg.transform.position;
+
 		InitialiseBattle ();
 	}
 
@@ -50,7 +73,8 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 			firstBg.transform.position = firstBgStartPos + Vector2.left * newPosition;
 			secondBg.transform.position = secondBgStartPos + Vector2.left * newPosition;
 		}
-
+			
+		// Elliot follows a basic movement pattern of moving in and out of screen
 		if (!isMovingElliot && BattleController.instance.isLevelReadyToStart) 
 		{
 			if (isElliotMovingIn) {
@@ -62,7 +86,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 			}
 		}
 
-		// If player is hit, move Elliot away
+		// If player is hit, move Elliot out of screen quickly
 		if (currentDarkening < heart.darkening || currentDarkening >= heart.darkeningMax && BattleController.instance.isLevelReadyToStart) 
 		{
 			currentDarkening = heart.darkening;
@@ -71,8 +95,55 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 			isElliotMovingIn = true;
 			Debug.Log ("Item0 Seq0 Level Ending, Event Start");
 		}
+			
+		if (BattleController.instance.isLevelReadyToStart && !isSequenceStarted) 
+		{
+			isSequenceStarted = true;
+			InvokeRepeating ("ExecuteNextSpawnType", 0, 10);
+		}
+
 	}
 
+	void ExecuteNextSpawnType()
+	{
+		if (waveNo >= 20) 
+		{
+			noCorridorSpawn.enabled = false;
+			horizontalSpawn.enabled = false;
+			diagonalSpawn.enabled = false;
+			hadoukenSpawn.enabled = true;
+			BattleController.instance.SetBulletSpeed (5, BattleController.SpawnObjectEnum.barb);
+		} 
+		else 
+		{
+			int spawnType = waveNo % 3;
+			switch (spawnType) 
+			{
+			case 0:
+				noCorridorSpawn.enabled = false;
+				horizontalSpawn.enabled = true;
+				if (waveNo != 0) 
+				{
+					bulletSpeed = bulletSpeed >= bulletMaxSpeed ? bulletSpeed : bulletSpeed + 1;
+					BattleController.instance.SetBulletSpeed (bulletSpeed, BattleController.SpawnObjectEnum.barb);
+				}
+				break;
+			case 1:
+				horizontalSpawn.enabled = false;
+				diagonalSpawn.enabled = true;
+				break;
+			case 2:
+				diagonalSpawn.enabled = false;
+				noCorridorSpawn.enabled = true;
+				break;
+			default:
+				Debug.Log ("== Item0 Seq 0 SpawnType error ==");
+				break;
+			}
+			waveNo++;
+		}
+	}
+		
 	void InitialiseBattle()
 	{
 		BattleController.instance.backgroundFront.GetComponent<SpriteRenderer>().color = new Vector4(1, 1, 1, 0);

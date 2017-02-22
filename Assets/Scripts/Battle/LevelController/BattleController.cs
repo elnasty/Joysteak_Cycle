@@ -8,7 +8,7 @@ public class BattleController : MonoBehaviour {
 	/// <summary>
 	/// The Controller in battle scene.
 	/// Has a reference to GameManager to update model
-	/// Listens to player (heart) and projectiles 
+	/// Listens to player (heart), Elliot and projectiles 
 	/// </summary>
 
 	[Header("Basic/Player Options")]
@@ -127,6 +127,15 @@ public class BattleController : MonoBehaviour {
 	{
 		DestroyAllProjectilesWithEffect (bulletDisintegrate);
 		isLevelReadyToStart = false;
+	}
+
+	public void SetBulletSpeed(float bulletSpeed, SpawnObjectEnum objType) 
+	{
+		List<GameObject> projectiles = BattleController.instance.pools [(int)objType];
+		foreach (GameObject projectile in projectiles) 
+		{
+			projectile.GetComponent<Projectile> ().velocity = bulletSpeed;
+		}
 	}
 
 	void DestroyAllProjectilesWithEffect(ParticleSystem vfx) 

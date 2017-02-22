@@ -32,7 +32,7 @@ public class SpawnStraightCorridor : MonoBehaviour
 			} 
 			else 
 			{
-				noChildSpawnIndex = Random.Range (1, transform.childCount-1);
+				noChildSpawnIndex = Random.Range (2, transform.childCount-2);
 			}
 		}
 	}
