@@ -9,13 +9,13 @@ public class RingShield : MonoBehaviour {
 
 	private SpriteRenderer ringSprite;
 	private float currentColorVal;
-	private float initialColorVal;
 	private float timer = 0;
 
-	void Start ()
+	void OnEnable ()
 	{
 		ringSprite = GetComponent<SpriteRenderer> ();
-		initialColorVal = ringSprite.color.r;
+		ringSprite.color = new Color (0, 0, 0, 0);
+		StartCoroutine (Spawn ());
 	}
 
 	void OnTriggerStay2D(Collider2D other)
@@ -62,15 +62,14 @@ public class RingShield : MonoBehaviour {
 		// For spinning effect
 		transform.Rotate(0, 0, 50 * Time.deltaTime);
 	}
-
-
+		
 	IEnumerator Wither()
 	{
 		isWithering = true;
 		while (timer <= witherDuration)
 		{
 			timer += Time.fixedDeltaTime;
-			currentColorVal = Mathf.Lerp (initialColorVal, 0, timer / witherDuration);
+			currentColorVal = Mathf.Lerp (1, 0, timer / witherDuration);
 			ringSprite.color = new Color (currentColorVal, currentColorVal, currentColorVal, currentColorVal);
 			yield return new WaitForFixedUpdate();
 		}
@@ -78,6 +77,20 @@ public class RingShield : MonoBehaviour {
 		{
 			BattleController.instance.isPlayerInvulnerable = false;
 		}
-		Destroy (this.gameObject);
+		isWithering = false;
+		timer = 0;
+		this.gameObject.SetActive (false);
+	}
+
+	IEnumerator Spawn()
+	{
+		while (timer <= 1f)
+		{
+			timer += Time.fixedDeltaTime;
+			currentColorVal = Mathf.Lerp (0, 1, timer / 1);
+			ringSprite.color = new Color (currentColorVal, currentColorVal, currentColorVal, currentColorVal);
+			yield return new WaitForFixedUpdate();
+		}
+		timer = 0;
 	}
 }

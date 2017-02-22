@@ -6,10 +6,19 @@ public class SpawnNoCorridor : MonoBehaviour
 {
 	public float delay;
 	public float corridorLength;
+	public GameObject[] ringShields;
 
 	private float time = 0.0f;
 	private int rowNumber = 0;
 
+	void OnEnable()
+	{
+		foreach (GameObject ringShield in ringShields) 
+		{
+			ringShield.SetActive (true);
+		}
+	}
+		
 	void Update ()
 	{
 		time += Time.deltaTime;
