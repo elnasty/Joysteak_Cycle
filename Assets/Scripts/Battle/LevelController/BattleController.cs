@@ -25,7 +25,7 @@ public class BattleController : MonoBehaviour {
 	public List<bool> willGrow;     //whether or not the pools will grow to accomodate increasing demand for the object.
 	public List<GameObject> objectPrefabs = new List<GameObject>();
 	public List<List<GameObject>> pools = new List<List<GameObject>>(); //each list is an object pool for type of object.
-	public enum SpawnObjectEnum { thorn, vine1, vine2, barb };
+	public enum SpawnObjectEnum { thorn, vine1, vine2, barb, ringShield, ring };
 
 	[Header("Pause/Cutscene Options")]
 	public bool isLevelReadyToStart = false;
