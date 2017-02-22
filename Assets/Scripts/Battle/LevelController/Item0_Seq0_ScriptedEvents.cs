@@ -9,6 +9,8 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	GameObject firstBg;
 	GameObject secondBg;
 	GameObject elliot;
+	GameObject[] ringShields;
+	public GameObject corridorSpawn;
 
 	SpawnStraightCorridor horizontalSpawn;
 	SpawnDiagonalCorridor diagonalSpawn;
@@ -29,6 +31,8 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	float bgWidth;
 	float startTime;
 	float currentDarkening = 0f;
+	float ringShieldStartPosX;
+	float ringShieldRotOffset = 5;
 	int waveNo = 0;
 	int nextCameraRotAngle = 0;
 
@@ -45,11 +49,13 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		elliotStartPos = elliot.transform.position;
 		elliotEndPos = (Vector2) elliot.transform.position + new Vector2 (10, 0);
 
-		GameObject corridorSpawn = elliot.transform.FindChild ("CorridorSpawn").gameObject; //Gameobject is specific only to this sequence
 		horizontalSpawn = corridorSpawn.transform.GetComponent<SpawnStraightCorridor> ();
 		diagonalSpawn = corridorSpawn.transform.GetComponent<SpawnDiagonalCorridor> ();
 		noCorridorSpawn = corridorSpawn.transform.GetComponent<SpawnNoCorridor> ();
 		hadoukenSpawn = corridorSpawn.transform.GetComponent<SpawnHadoukenWave> ();
+
+		ringShields = noCorridorSpawn.ringShields;
+		ringShieldStartPosX = ringShields [0].transform.position.x;
 
 		firstBg = BattleController.instance.backgroundFront;
 		bgWidth = firstBg.transform.GetComponent<SpriteRenderer> ().bounds.size.x;
@@ -116,6 +122,9 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 			StartCoroutine (MoveElliot (elliotEndPos, elliotFastSpeed * 4));
 			isElliotMovingIn = true;
 		}
+
+		// CorridorSpawn gameobject sticks to Elliot
+		corridorSpawn.transform.position = elliot.transform.position;
 	}
 
 	void ScrollBackground()
@@ -137,18 +146,21 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	{
 		if (waveNo >= 20) 
 		{
+			// Player too pro. Force the end of item 0 seq 0. Activate Hadouken Spawn
 			noCorridorSpawn.enabled = false;
 			horizontalSpawn.enabled = false;
 			diagonalSpawn.enabled = false;
 			hadoukenSpawn.enabled = true;
 			BattleController.instance.SetBulletSpeed (5, BattleController.SpawnObjectEnum.barb);
 		} 
-		else 
-		{
+		else // Just execute the next spawn while rotating camera
+		{ 	
 			if (waveNo != 0) 
 			{
 				nextCameraRotAngle = nextCameraRotAngle + 90;
 				StartCoroutine (RotateCamera ());
+				MoveRingShields (); // To move ringShields back into camera's view during camera rotation
+
 			}
 
 			int spawnType = waveNo % 3;
@@ -186,6 +198,18 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		StartCoroutine(FadeIn(BattleController.instance.backgroundFront, 2f, 1f));
 		StartCoroutine(FadeIn(BattleController.instance.backgroundBack, 3f, 1f));
 		StartCoroutine(FadeIn(BattleController.instance.elliot, 4.5f, 1f));
+	}
+
+	void MoveRingShields()
+	{
+		foreach (GameObject ringShield in ringShields) 
+		{
+			float nextPosX = waveNo % 2 != 0 ? ringShieldStartPosX + ringShieldRotOffset : ringShieldStartPosX;
+			float posY = ringShield.transform.position.y;
+			Vector2 target = new Vector2 (nextPosX, posY);
+			float speed = elliotFastSpeed * 2;
+			StartCoroutine (MoveObject (ringShield, target, speed));
+		}
 	}
 
 	IEnumerator FadeIn(GameObject gameObj, float delay, float time)
@@ -241,5 +265,15 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		heart.transform.eulerAngles = new Vector3(0, 0, nextCameraRotAngle);
 		elliot.transform.eulerAngles = new Vector3(0, 0, nextCameraRotAngle);
 		Camera.main.transform.eulerAngles = new Vector3(0, 0, nextCameraRotAngle);
+	}
+
+	IEnumerator MoveObject(GameObject obj, Vector2 target, float speed)
+	{
+		float step = speed * Time.deltaTime;
+		while (Vector2.Distance (target, obj.transform.position) > 0.1f) 
+		{
+			obj.transform.position = Vector2.MoveTowards (obj.transform.position, target, step);
+			yield return null;
+		}
 	}
 }
