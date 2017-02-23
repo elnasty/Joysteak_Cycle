@@ -41,6 +41,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	bool isElliotMovingIn = true;
 	bool isSequenceStarted = false;
 	bool shouldPlayEndEvent = false;
+	bool isPlayingEndEvent = false;
 
 	void Start () 
 	{
@@ -74,17 +75,17 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		if (shouldStartSequence ()) StartSequence0 ();
 		if (!shouldPlayEndEvent) ElliotSeqMovement ();
 		if (isPlayerDead ()) EndSequence0 ();
-		if (shouldPlayEndEvent) StartCoroutine (MoveObject (elliot, new Vector2 (5.5f, 0), elliotSlowSpeed/2));
+		if (shouldPlayEndEvent && !isPlayingEndEvent) StartCoroutine (PlayEndEvent ());
 	}
 
 	bool shouldStartSequence()
 	{
-		return BattleController.instance.isLevelReadyToStart && !isSequenceStarted;
+		return BattleController.instance.isLevelReadyToStart && !isSequenceStarted && !shouldPlayEndEvent;
 	}
 
 	bool isPlayerDead()
 	{
-		return !BattleController.instance.isLevelReadyToStart && isSequenceStarted;
+		return !BattleController.instance.isLevelReadyToStart && isSequenceStarted && !shouldPlayEndEvent;
 	}
 
 	void StartSequence0()
@@ -285,5 +286,29 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		if (obj.tag == "Player" && isPlayerDead ()) shouldPlayEndEvent = true;
 		if (obj.tag == "Player") BattleController.instance.isLevelReadyToStart = true;
 		if (obj.tag == "Elliot") isMovingElliot = false;
+	}
+
+	IEnumerator PlayEndEvent()
+	{
+		BattleController.instance.isLevelReadyToStart = false;
+		isPlayingEndEvent = true;
+
+		// Elliot moves into camera view
+		isMovingElliot = true;
+		Vector2 target = new Vector2 (5.5f, 0);
+		while (Vector2.Distance (target, elliot.transform.position) > 0.1f) 
+		{
+			elliot.transform.position = Vector2.MoveTowards (elliot.transform.position, target, 4 * Time.deltaTime);
+			yield return null;
+		}
+		isMovingElliot = false;
+
+		// Elliot drops a rose projectile
+
+		// Elliot circles around rose until it blooms
+
+		// Elliot leaves the stage
+
+		isPlayingEndEvent = false;
 	}
 }
