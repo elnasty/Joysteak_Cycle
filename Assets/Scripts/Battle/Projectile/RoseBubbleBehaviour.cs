@@ -9,6 +9,8 @@ public class RoseBubbleBehaviour : Projectile {
 	public float activateAfterTime;
 	public float wiltAfterTime;
 	public float wiltDuration;
+	public bool roseBudActivated;
+	public bool canRoseWilt = true;
 	public GameObject circle;
 
 	[Header("Movement Settings")]
@@ -17,7 +19,6 @@ public class RoseBubbleBehaviour : Projectile {
 	private float timer;
 	private float initialColorVal;
 	private float currentColorVal;
-	private bool roseBudActivated;
 	private bool roseBudActivating;
 	private bool roseBudWilted;
 	private bool startWiltingInvoked;
@@ -25,10 +26,6 @@ public class RoseBubbleBehaviour : Projectile {
 	private GameObject playerObj;
 	private SpriteRenderer flowerSprite;
 	private SpriteRenderer circleSprite;
-
-	//TODO: Just for movement test. Movement could (should?) be determined by wave class?
-	private bool isMoving = false;
-
 
 	void Start ()
 	{
@@ -46,14 +43,6 @@ public class RoseBubbleBehaviour : Projectile {
 
 	void Update () 
 	{
-		if (BattleController.instance.isLevelReadyToStart && !isMoving) 
-		{	//TODO: Just for movement test. Movement could (should?) be determined by wave class?
-			isMoving = true;
-			StartCoroutine (MoveStraightToPos (waypoint.transform.position));
-		}
-		
-		if (!BattleController.instance.isLevelReadyToStart) return;
-
 		if (!roseBudActivated) ActivateOrWiltRose ();
 		else DetectAndHealPlayer ();
 
@@ -88,7 +77,7 @@ public class RoseBubbleBehaviour : Projectile {
 			else DeactivatingRoseBud ();
 		}
 
-		if (distance > triggerRadius && !roseBudActivated && !roseBudActivating) 
+		if (distance > triggerRadius && !roseBudActivated && !roseBudActivating && canRoseWilt) 
 		{
 			if (!roseBudWilting && !roseBudWilted && !startWiltingInvoked) 
 			{
@@ -99,7 +88,7 @@ public class RoseBubbleBehaviour : Projectile {
 	}
 
 
-	void ActivateRoseBud() 
+	public void ActivateRoseBud() 
 	{
 		timer = 0;
 		roseBudActivated = true;
@@ -155,17 +144,5 @@ public class RoseBubbleBehaviour : Projectile {
 		roseBudWilting = false;
 		roseBudWilted = true;
 		gameObject.SetActive(false);
-	}
-
-
-	//TODO: Just for movement test. Movement could (should?) be determined by wave class?
-	IEnumerator MoveStraightToPos(Vector3 target)
-	{
-		float step = base.velocity * Time.fixedDeltaTime;
-		while (Vector3.Distance(target, transform.position) > 0.1f)
-		{
-			transform.position = Vector3.MoveTowards (transform.position, target, step);
-			yield return new WaitForFixedUpdate();
-		}
 	}
 }

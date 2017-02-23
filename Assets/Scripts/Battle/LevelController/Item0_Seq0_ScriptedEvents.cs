@@ -10,6 +10,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	GameObject secondBg;
 	GameObject elliot;
 	GameObject[] ringShields;
+	public GameObject rose;
 	public GameObject corridorSpawn;
 
 	SpawnStraightCorridor horizontalSpawn;
@@ -103,6 +104,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		diagonalSpawn.enabled = false;
 		noCorridorSpawn.enabled = false;
 		hadoukenSpawn.enabled = false;
+		StartCoroutine (RotateCamera ());
 		StartCoroutine (MoveObject (elliot, elliotEndPos, elliotFastSpeed * 4));
 		StartCoroutine (MoveObject (heart, new Vector2 (-5.5f, 0), elliotFastSpeed * 4));
 	}
@@ -304,11 +306,42 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		isMovingElliot = false;
 
 		// Elliot drops a rose projectile
+		float timer = 0;
+		float duration = 1;
+		float currentColorVal = 0;
+		rose.SetActive (true);
+		SpriteRenderer roseSprite = rose.transform.GetComponent<SpriteRenderer> ();
+		roseSprite.color = new Color (143/255f, 143/255f, 143/255f, 0);
+		while (timer <= duration)
+		{
+			timer += Time.fixedDeltaTime;
+			currentColorVal = Mathf.Lerp (0, 1, timer / duration);
+			roseSprite.color = new Color (143/255f, 143/255f, 143/255f, currentColorVal);
+			yield return null;
+		}
 
 		// Elliot circles around rose until it blooms
+		timer = 0;
+		duration = 3;
+		while (timer <= duration)
+		{
+			timer += Time.fixedDeltaTime;
+			currentColorVal = Mathf.Lerp (143/255f, 1, timer / duration);
+			roseSprite.color = new Color (currentColorVal, currentColorVal, currentColorVal, 1);
+			yield return null;
+		}
+		rose.transform.GetComponent<RoseBubbleBehaviour> ().ActivateRoseBud ();
 
 		// Elliot leaves the stage
+		isMovingElliot = true;
+		target = elliotEndPos;
+		while (Vector2.Distance (target, elliot.transform.position) > 0.1f) 
+		{
+			elliot.transform.position = Vector2.MoveTowards (elliot.transform.position, target, 4 * Time.deltaTime);
+			yield return null;
+		}
+		isMovingElliot = false;
 
-		isPlayingEndEvent = false;
+		BattleController.instance.isLevelReadyToStart = true;
 	}
 }
