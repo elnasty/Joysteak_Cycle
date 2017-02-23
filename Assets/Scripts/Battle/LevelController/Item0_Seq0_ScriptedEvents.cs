@@ -320,28 +320,42 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 			yield return null;
 		}
 
-		// Elliot circles around rose until it blooms
-		timer = 0;
-		duration = 3;
-		while (timer <= duration)
-		{
-			timer += Time.fixedDeltaTime;
-			currentColorVal = Mathf.Lerp (143/255f, 1, timer / duration);
-			roseSprite.color = new Color (currentColorVal, currentColorVal, currentColorVal, 1);
-			yield return null;
-		}
-		rose.transform.GetComponent<RoseBubbleBehaviour> ().ActivateRoseBud ();
-
-		// Elliot leaves the stage
+		// Elliot approaches the circle
 		isMovingElliot = true;
-		target = elliotEndPos;
+		target = new Vector2 (2.5f, 0);
 		while (Vector2.Distance (target, elliot.transform.position) > 0.1f) 
 		{
 			elliot.transform.position = Vector2.MoveTowards (elliot.transform.position, target, 4 * Time.deltaTime);
 			yield return null;
 		}
 		isMovingElliot = false;
+		elliot.transform.SetParent(rose.transform);
+
+		// Elliot circles around rose until it blooms
+		timer = 0;
+		duration = 7;
+		while (timer <= duration)
+		{
+			timer += Time.fixedDeltaTime;
+			currentColorVal = Mathf.Lerp (143/255f, 1, timer / duration);
+			roseSprite.color = new Color (currentColorVal, currentColorVal, currentColorVal, 1);
+			elliot.transform.eulerAngles = new Vector3(0, 0, 0);
+			yield return null;
+		}
+		rose.transform.GetComponent<RoseBubbleBehaviour> ().ActivateRoseBud ();
+		elliot.transform.SetParent(null);
+
+		// Elliot leaves the stage
+		isMovingElliot = true;
+		target = elliotEndPos;
+		while (Vector2.Distance (target, elliot.transform.position) > 0.1f) 
+		{
+			elliot.transform.position = Vector2.MoveTowards (elliot.transform.position, target, 5 * Time.deltaTime);
+			yield return null;
+		}
+		isMovingElliot = false;
 
 		BattleController.instance.isLevelReadyToStart = true;
 	}
+
 }
