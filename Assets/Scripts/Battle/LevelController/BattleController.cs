@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 using System;
 
@@ -34,6 +35,13 @@ public class BattleController : MonoBehaviour {
 	[Header("Special Effects Options")]
 	public ParticleSystem bulletDisintegrate;
 	private RippleEffect ripple;
+
+	void Update()
+	{
+		// TODO: To be removed - Quick restart level for QA testing
+		if (Input.GetKeyDown (KeyCode.R))
+			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+	}
 
 	void Awake()
 	{

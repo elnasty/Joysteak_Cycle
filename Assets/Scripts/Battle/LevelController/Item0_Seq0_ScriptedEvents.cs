@@ -28,6 +28,8 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	public float bulletMaxSpeed = 20;
 	public float elliotFastSpeed = 1.3f;
 	public float elliotSlowSpeed = 0.3f;
+	public float waveDuration = 10;
+	public float minWaveDuration = 5;
 
 	float bgWidth;
 	float startTime;
@@ -37,6 +39,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	float nextCameraRotAngle = 0;
 	int waveNo = 0;
 
+	bool isRingShieldNear = false;
 	bool shouldBgScroll = false;
 	bool isMovingElliot = false;
 	bool isElliotMovingIn = true;
@@ -92,7 +95,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	void StartSequence0()
 	{
 		isSequenceStarted = true;
-		InvokeRepeating ("ExecuteNextSpawnType", 0, 10);
+		InvokeRepeating ("ExecuteNextSpawnType", 0, waveDuration);
 	}
 
 	void EndSequence0()
@@ -165,7 +168,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 
 	void ExecuteNextSpawnType()
 	{
-		if (waveNo >= 20) 
+		if (waveNo >= 17) 
 		{
 			// Player too pro. Force the end of item 0 seq 0. Activate Hadouken Spawn
 			noCorridorSpawn.enabled = false;
@@ -176,24 +179,19 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		} 
 		else // Just execute the next spawn while rotating camera
 		{ 	
-			if (waveNo != 0) 
+			if (waveNo != 0 && waveNo % 4 != 3) 
 			{
 				nextCameraRotAngle = nextCameraRotAngle + 90;
 				StartCoroutine (RotateCamera ());
 				MoveRingShields (); // To move ringShields back into camera's view during camera rotation
 			}
 
-			int spawnType = waveNo % 3;
+			int spawnType = waveNo % 4;
 			switch (spawnType) 
 			{
 			case 0:
 				noCorridorSpawn.enabled = false;
 				horizontalSpawn.enabled = true;
-				if (waveNo != 0) 
-				{
-					bulletSpeed = bulletSpeed >= bulletMaxSpeed ? bulletSpeed : bulletSpeed + 1;
-					BattleController.instance.SetBulletSpeed (bulletSpeed, BattleController.SpawnObjectEnum.barb);
-				}
 				break;
 			case 1:
 				horizontalSpawn.enabled = false;
@@ -202,6 +200,15 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 			case 2:
 				diagonalSpawn.enabled = false;
 				noCorridorSpawn.enabled = true;
+				break;
+			case 3:
+				// Increase bullet speed
+				bulletSpeed = bulletSpeed >= bulletMaxSpeed ? bulletSpeed : bulletSpeed + 1;
+				BattleController.instance.SetBulletSpeed (bulletSpeed, BattleController.SpawnObjectEnum.barb);
+				// Decrease wave duration
+				waveDuration = waveDuration > minWaveDuration ? waveDuration - 2 : waveDuration;
+				CancelInvoke();
+				isSequenceStarted = false;
 				break;
 			default:
 				Debug.Log ("Item0 Seq 0 SpawnType error");
@@ -222,9 +229,11 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 
 	void MoveRingShields()
 	{
+		isRingShieldNear = !isRingShieldNear;
+		float nextPosX = isRingShieldNear ? ringShieldStartPosX + ringShieldRotOffset : ringShieldStartPosX;
+
 		foreach (GameObject ringShield in ringShields) 
 		{
-			float nextPosX = waveNo % 2 != 0 ? ringShieldStartPosX + ringShieldRotOffset : ringShieldStartPosX;
 			float posY = ringShield.transform.position.y;
 			Vector2 target = new Vector2 (nextPosX, posY);
 			float speed = elliotFastSpeed * 2;
