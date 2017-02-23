@@ -63,14 +63,14 @@ public class RingShield : MonoBehaviour {
 		transform.Rotate(0, 0, 50 * Time.deltaTime);
 	}
 		
-	IEnumerator Wither()
+	public IEnumerator Wither()
 	{
 		isWithering = true;
 		while (timer <= witherDuration)
 		{
 			timer += Time.fixedDeltaTime;
 			currentColorVal = Mathf.Lerp (1, 0, timer / witherDuration);
-			ringSprite.color = new Color (currentColorVal, currentColorVal, currentColorVal, currentColorVal);
+			if (ringSprite!=null) ringSprite.color = new Color (currentColorVal, currentColorVal, currentColorVal, currentColorVal);
 			yield return new WaitForFixedUpdate();
 		}
 		if (BattleController.instance.isPlayerInvulnerable) 
@@ -82,7 +82,7 @@ public class RingShield : MonoBehaviour {
 		this.gameObject.SetActive (false);
 	}
 
-	IEnumerator Spawn()
+	public IEnumerator Spawn()
 	{
 		while (timer <= 1f)
 		{

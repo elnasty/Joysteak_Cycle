@@ -166,7 +166,7 @@ public class Heart : MonoBehaviour
 		if (isKnockedBack) {
 			return;
 		}
-        if (Input.GetMouseButton(0) )
+		if (Input.GetMouseButton(0) && BattleController.instance.isLevelReadyToStart)
         {
             // If mouse is left clicked, get direction
             mousePosition = new Vector3(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);

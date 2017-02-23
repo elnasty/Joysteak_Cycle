@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Item0_Seq0_ScriptedEvents : MonoBehaviour 
 {
-	Heart heart;
+	GameObject heart;
 
 	GameObject firstBg;
 	GameObject secondBg;
@@ -33,17 +33,18 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	float currentDarkening = 0f;
 	float ringShieldStartPosX;
 	float ringShieldRotOffset = 5;
+	float nextCameraRotAngle = 0;
 	int waveNo = 0;
-	int nextCameraRotAngle = 0;
 
 	bool shouldBgScroll = false;
 	bool isMovingElliot = false;
 	bool isElliotMovingIn = true;
 	bool isSequenceStarted = false;
+	bool shouldStartEndEvent = false;
 
 	void Start () 
 	{
-		heart = BattleController.instance.heart.transform.GetComponent<Heart> ();
+		heart = BattleController.instance.heart;
 
 		elliot = BattleController.instance.elliot;
 		elliotStartPos = elliot.transform.position;
@@ -72,7 +73,11 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		ElliotSeqMovement ();
 		ScrollBackground ();
 		if (shouldStartSequence ()) StartSequence0 ();
-		if (isPlayerDead ()) StartEndingEvent ();
+		if (isPlayerDead ()) EndSequence0 ();
+		if (shouldStartEndEvent) 
+		{
+			//TODO: Play end event
+		}
 	}
 
 	bool shouldStartSequence()
@@ -91,14 +96,28 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		InvokeRepeating ("ExecuteNextSpawnType", 0, 10);
 	}
 
-	void StartEndingEvent()
+	void EndSequence0()
 	{
 		CancelInvoke ();
-		StopAllCoroutines ();
+		HideAllRingShields ();
 		horizontalSpawn.enabled = false;
 		diagonalSpawn.enabled = false;
 		noCorridorSpawn.enabled = false;
 		hadoukenSpawn.enabled = false;
+		StartCoroutine (MoveElliot (elliotEndPos, elliotFastSpeed * 4));
+		StartCoroutine (MoveHeart (new Vector2 (-5.5f, 0), elliotSlowSpeed / 2));
+		shouldStartEndEvent = true;
+	}
+		
+	void HideAllRingShields()
+	{
+		foreach (GameObject ringshield in noCorridorSpawn.ringShields)
+		{
+			float originalWitherDuration = ringshield.GetComponent<RingShield> ().witherDuration;
+			ringshield.GetComponent<RingShield> ().witherDuration = 1;
+			StartCoroutine (ringshield.GetComponent<RingShield> ().Wither ());
+			ringshield.GetComponent<RingShield> ().witherDuration = originalWitherDuration;
+		}
 	}
 
 	void ElliotSeqMovement()
@@ -115,9 +134,11 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 			}
 		}
 		// If player is hit, move Elliot out of screen quickly
-		if (currentDarkening < heart.darkening || currentDarkening >= heart.darkeningMax && BattleController.instance.isLevelReadyToStart) 
+		if (currentDarkening < heart.transform.GetComponent<Heart>().darkening || 
+			currentDarkening >= heart.transform.GetComponent<Heart>().darkeningMax && 
+			BattleController.instance.isLevelReadyToStart) 
 		{
-			currentDarkening = heart.darkening;
+			currentDarkening = heart.transform.GetComponent<Heart>().darkening;
 			StopCoroutine (MoveElliot (new Vector2 (), 0));
 			StartCoroutine (MoveElliot (elliotEndPos, elliotFastSpeed * 4));
 			isElliotMovingIn = true;
@@ -160,7 +181,6 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 				nextCameraRotAngle = nextCameraRotAngle + 90;
 				StartCoroutine (RotateCamera ());
 				MoveRingShields (); // To move ringShields back into camera's view during camera rotation
-
 			}
 
 			int spawnType = waveNo % 3;
@@ -184,7 +204,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 				noCorridorSpawn.enabled = true;
 				break;
 			default:
-				Debug.Log ("== Item0 Seq 0 SpawnType error ==");
+				Debug.Log ("Item0 Seq 0 SpawnType error");
 				break;
 			}
 			waveNo++;
@@ -240,28 +260,16 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		}
 	}
 
-	IEnumerator MoveElliot(Vector2 target, float speed)
-	{
-		isMovingElliot = true;
-		float step = speed * Time.deltaTime;
-		while (Vector2.Distance(target, elliot.transform.position) > 0.1f)
-		{
-			elliot.transform.position = Vector2.MoveTowards (elliot.transform.position, target, step);
-			yield return null;
-		}
-		isMovingElliot = false;
-	}
-
 	IEnumerator RotateCamera()
 	{
 		while (Camera.main.transform.eulerAngles.z < nextCameraRotAngle - 1) 
 		{
-			heart.transform.Rotate (0, 0, 85 * Time.deltaTime);
+			heart.transform.Rotate (0, 0, 85 * Time.deltaTime); 
 			elliot.transform.Rotate (0, 0, 50 * Time.deltaTime);
 			Camera.main.transform.Rotate (0, 0, 50 * Time.deltaTime);
 			yield return null;
 		}
-		nextCameraRotAngle = nextCameraRotAngle == 360 ? 0 : nextCameraRotAngle;
+		nextCameraRotAngle = nextCameraRotAngle >= 360 ? 0 : nextCameraRotAngle;
 		heart.transform.eulerAngles = new Vector3(0, 0, nextCameraRotAngle);
 		elliot.transform.eulerAngles = new Vector3(0, 0, nextCameraRotAngle);
 		Camera.main.transform.eulerAngles = new Vector3(0, 0, nextCameraRotAngle);
@@ -275,5 +283,29 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 			obj.transform.position = Vector2.MoveTowards (obj.transform.position, target, step);
 			yield return null;
 		}
+	}
+
+	IEnumerator MoveHeart(Vector2 target, float speed)
+	{
+		BattleController.instance.isLevelReadyToStart = false;
+		float step = speed * Time.deltaTime;
+		while (Vector2.Distance (target, heart.transform.position) > 0.1f) 
+		{
+			heart.transform.position = Vector2.MoveTowards (heart.transform.position, target, step);
+			yield return null;
+		}
+		BattleController.instance.isLevelReadyToStart = true;
+	}
+
+	IEnumerator MoveElliot(Vector2 target, float speed)
+	{
+		isMovingElliot = true;
+		float step = speed * Time.deltaTime;
+		while (Vector2.Distance(target, elliot.transform.position) > 0.1f)
+		{
+			elliot.transform.position = Vector2.MoveTowards (elliot.transform.position, target, step);
+			yield return null;
+		}
+		isMovingElliot = false;
 	}
 }
