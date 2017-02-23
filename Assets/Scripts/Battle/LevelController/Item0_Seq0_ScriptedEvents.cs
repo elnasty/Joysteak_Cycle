@@ -40,7 +40,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	bool isMovingElliot = false;
 	bool isElliotMovingIn = true;
 	bool isSequenceStarted = false;
-	bool shouldStartEndEvent = false;
+	bool shouldPlayEndEvent = false;
 
 	void Start () 
 	{
@@ -70,14 +70,11 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 
 	void Update() 
 	{
-		ElliotSeqMovement ();
 		ScrollBackground ();
 		if (shouldStartSequence ()) StartSequence0 ();
+		if (!shouldPlayEndEvent) ElliotSeqMovement ();
 		if (isPlayerDead ()) EndSequence0 ();
-		if (shouldStartEndEvent) 
-		{
-			//TODO: Play end event
-		}
+		if (shouldPlayEndEvent) StartCoroutine (MoveObject (elliot, new Vector2 (5.5f, 0), elliotSlowSpeed/2));
 	}
 
 	bool shouldStartSequence()
@@ -99,14 +96,14 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	void EndSequence0()
 	{
 		CancelInvoke ();
+		StopAllCoroutines ();
 		HideAllRingShields ();
 		horizontalSpawn.enabled = false;
 		diagonalSpawn.enabled = false;
 		noCorridorSpawn.enabled = false;
 		hadoukenSpawn.enabled = false;
-		StartCoroutine (MoveElliot (elliotEndPos, elliotFastSpeed * 4));
-		StartCoroutine (MoveHeart (new Vector2 (-5.5f, 0), elliotSlowSpeed / 2));
-		shouldStartEndEvent = true;
+		StartCoroutine (MoveObject (elliot, elliotEndPos, elliotFastSpeed * 4));
+		StartCoroutine (MoveObject (heart, new Vector2 (-5.5f, 0), elliotFastSpeed * 4));
 	}
 		
 	void HideAllRingShields()
@@ -126,10 +123,10 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		if (!isMovingElliot && BattleController.instance.isLevelReadyToStart) 
 		{
 			if (isElliotMovingIn) {
-				StartCoroutine (MoveElliot (elliotStartPos, elliotSlowSpeed));
+				StartCoroutine (MoveObject (elliot, elliotStartPos, elliotSlowSpeed));
 				isElliotMovingIn = false;
 			} else {
-				StartCoroutine (MoveElliot (elliotEndPos, elliotSlowSpeed));
+				StartCoroutine (MoveObject (elliot, elliotEndPos, elliotSlowSpeed));
 				isElliotMovingIn = true;
 			}
 		}
@@ -139,8 +136,8 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 			BattleController.instance.isLevelReadyToStart) 
 		{
 			currentDarkening = heart.transform.GetComponent<Heart>().darkening;
-			StopCoroutine (MoveElliot (new Vector2 (), 0));
-			StartCoroutine (MoveElliot (elliotEndPos, elliotFastSpeed * 4));
+			StopCoroutine (MoveObject (elliot, new Vector2 (), 0));
+			StartCoroutine (MoveObject (elliot, elliotEndPos, elliotFastSpeed * 4));
 			isElliotMovingIn = true;
 		}
 
@@ -256,7 +253,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 			BattleController.instance.isLevelReadyToStart = true;
 			shouldBgScroll = true;
 			startTime = Time.time;
-			StartCoroutine (MoveElliot (elliotEndPos, elliotFastSpeed));
+			StartCoroutine (MoveObject (elliot, elliotEndPos, elliotFastSpeed));
 		}
 	}
 
@@ -277,35 +274,16 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 
 	IEnumerator MoveObject(GameObject obj, Vector2 target, float speed)
 	{
+		if (obj.tag == "Player") BattleController.instance.isLevelReadyToStart = false;
+		if (obj.tag == "Elliot") isMovingElliot = true;
 		float step = speed * Time.deltaTime;
 		while (Vector2.Distance (target, obj.transform.position) > 0.1f) 
 		{
 			obj.transform.position = Vector2.MoveTowards (obj.transform.position, target, step);
 			yield return null;
 		}
-	}
-
-	IEnumerator MoveHeart(Vector2 target, float speed)
-	{
-		BattleController.instance.isLevelReadyToStart = false;
-		float step = speed * Time.deltaTime;
-		while (Vector2.Distance (target, heart.transform.position) > 0.1f) 
-		{
-			heart.transform.position = Vector2.MoveTowards (heart.transform.position, target, step);
-			yield return null;
-		}
-		BattleController.instance.isLevelReadyToStart = true;
-	}
-
-	IEnumerator MoveElliot(Vector2 target, float speed)
-	{
-		isMovingElliot = true;
-		float step = speed * Time.deltaTime;
-		while (Vector2.Distance(target, elliot.transform.position) > 0.1f)
-		{
-			elliot.transform.position = Vector2.MoveTowards (elliot.transform.position, target, step);
-			yield return null;
-		}
-		isMovingElliot = false;
+		if (obj.tag == "Player" && isPlayerDead ()) shouldPlayEndEvent = true;
+		if (obj.tag == "Player") BattleController.instance.isLevelReadyToStart = true;
+		if (obj.tag == "Elliot") isMovingElliot = false;
 	}
 }
