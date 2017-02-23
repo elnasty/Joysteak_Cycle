@@ -328,6 +328,12 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 			roseSprite.color = new Color (143/255f, 143/255f, 143/255f, currentColorVal);
 			yield return null;
 		}
+		target = new Vector2 (0, 0);
+		while (Vector2.Distance (target, rose.transform.position) > 0.1f) 
+		{
+			rose.transform.position = Vector2.MoveTowards (rose.transform.position, target, 4 * Time.deltaTime);
+			yield return null;
+		}
 
 		// Elliot approaches the circle
 		isMovingElliot = true;
