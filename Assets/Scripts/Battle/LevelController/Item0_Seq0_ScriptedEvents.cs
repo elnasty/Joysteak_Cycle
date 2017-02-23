@@ -334,12 +334,13 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		// Elliot circles around rose until it blooms
 		timer = 0;
 		duration = 7;
+		float elliotZAngle = elliot.transform.eulerAngles.z;
 		while (timer <= duration)
 		{
 			timer += Time.fixedDeltaTime;
 			currentColorVal = Mathf.Lerp (143/255f, 1, timer / duration);
 			roseSprite.color = new Color (currentColorVal, currentColorVal, currentColorVal, 1);
-			elliot.transform.eulerAngles = new Vector3(0, 0, 0);
+			elliot.transform.eulerAngles = new Vector3(0, 0, elliotZAngle);
 			yield return null;
 		}
 		rose.transform.GetComponent<RoseBubbleBehaviour> ().ActivateRoseBud ();
