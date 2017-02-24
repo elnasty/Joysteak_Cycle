@@ -202,13 +202,15 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 				noCorridorSpawn.enabled = true;
 				break;
 			case 3:
-				// Increase bullet speed
-				bulletSpeed = bulletSpeed >= bulletMaxSpeed ? bulletSpeed : bulletSpeed + 1;
-				BattleController.instance.SetBulletSpeed (bulletSpeed, BattleController.SpawnObjectEnum.barb);
+				// TODO: Note - This section increases bullet speed, which may not be needed?
+				// bulletSpeed = bulletSpeed >= bulletMaxSpeed ? bulletSpeed : bulletSpeed + 1;
+				// BattleController.instance.SetBulletSpeed (bulletSpeed, BattleController.SpawnObjectEnum.barb);
+
 				// Decrease wave duration
 				waveDuration = waveDuration > minWaveDuration ? waveDuration - 2 : waveDuration;
 				CancelInvoke();
 				isSequenceStarted = false;
+
 				break;
 			default:
 				Debug.Log ("Item0 Seq 0 SpawnType error");
