@@ -29,7 +29,6 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	public float elliotFastSpeed = 1.3f;
 	public float elliotSlowSpeed = 0.3f;
 	public float waveDuration = 10;
-	public float minWaveDuration = 5;
 
 	float bgWidth;
 	float startTime;
@@ -39,6 +38,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	float nextCameraRotAngle = 0;
 	int waveNo = 0;
 
+	bool isCameraRotating = false;
 	bool isRingShieldNear = false;
 	bool shouldBgScroll = false;
 	bool isMovingElliot = false;
@@ -92,10 +92,19 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		return !BattleController.instance.isLevelReadyToStart && isSequenceStarted && !shouldPlayEndEvent;
 	}
 
+	bool areAllProjectilesDisabled ()
+	{
+		GameObject[] projectiles = GameObject.FindGameObjectsWithTag ("Projectile");
+		foreach (GameObject proj in projectiles) 
+			if (proj.activeSelf)
+				return false;
+		return true;
+	}
+
 	void StartSequence0()
 	{
 		isSequenceStarted = true;
-		InvokeRepeating ("ExecuteNextSpawnType", 0, waveDuration);
+		ExecuteNextSpawnType ();
 	}
 
 	void EndSequence0()
@@ -177,46 +186,9 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 			hadoukenSpawn.enabled = true;
 			BattleController.instance.SetBulletSpeed (5, BattleController.SpawnObjectEnum.barb);
 		} 
-		else // Just execute the next spawn while rotating camera
+		else // Just execute next spawn
 		{ 	
-			if (waveNo != 0 && waveNo % 4 != 3) 
-			{
-				nextCameraRotAngle = nextCameraRotAngle + 90;
-				StartCoroutine (RotateCamera ());
-				MoveRingShields (); // To move ringShields back into camera's view during camera rotation
-			}
-
-			int spawnType = waveNo % 4;
-			switch (spawnType) 
-			{
-			case 0:
-				noCorridorSpawn.enabled = false;
-				horizontalSpawn.enabled = true;
-				break;
-			case 1:
-				horizontalSpawn.enabled = false;
-				diagonalSpawn.enabled = true;
-				break;
-			case 2:
-				diagonalSpawn.enabled = false;
-				noCorridorSpawn.enabled = true;
-				break;
-			case 3:
-				// TODO: Note - This section increases bullet speed, which may not be needed?
-				// bulletSpeed = bulletSpeed >= bulletMaxSpeed ? bulletSpeed : bulletSpeed + 1;
-				// BattleController.instance.SetBulletSpeed (bulletSpeed, BattleController.SpawnObjectEnum.barb);
-
-				// Decrease wave duration
-				waveDuration = waveDuration > minWaveDuration ? waveDuration - 2 : waveDuration;
-				CancelInvoke();
-				isSequenceStarted = false;
-
-				break;
-			default:
-				Debug.Log ("Item0 Seq 0 SpawnType error");
-				break;
-			}
-			waveNo++;
+			StartCoroutine(ToggleSpawnType ());
 		}
 	}
 		
@@ -271,11 +243,48 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		}
 	}
 
+	IEnumerator ToggleSpawnType ()
+	{
+		if (waveNo != 0) 
+		{
+			nextCameraRotAngle = nextCameraRotAngle + 90;
+			StartCoroutine (RotateCamera ());
+		}
+		int spawnType = waveNo % 3;
+		switch (spawnType) {
+		case 0:
+			noCorridorSpawn.enabled = false;
+			while (isCameraRotating) yield return null;
+			horizontalSpawn.enabled = true;
+			if (waveNo != 0) Time.timeScale+= 0.5f;
+			break;
+		case 1:
+			horizontalSpawn.enabled = false;
+			while (isCameraRotating) yield return null;
+			diagonalSpawn.enabled = true;
+			break;
+		case 2:
+			diagonalSpawn.enabled = false;
+			while (isCameraRotating) yield return null;
+			noCorridorSpawn.enabled = true;
+			break;
+		default:
+			Debug.Log ("Item0 Seq 0 SpawnType error");
+			break;
+		}
+		waveNo++;
+		yield return new WaitForSeconds (waveDuration);
+		ExecuteNextSpawnType ();
+	}
+
 	IEnumerator RotateCamera()
 	{
+		isCameraRotating = true;
+		while (!areAllProjectilesDisabled()) yield return null; // Rotate camera after all rojectiles leave the screen
+		MoveRingShields (); // To move ringShields back into camera's view during camera rotation
 		while (Camera.main.transform.eulerAngles.z < nextCameraRotAngle - 1) 
 		{
-			heart.transform.Rotate (0, 0, 85 * Time.deltaTime); 
+			heart.transform.Rotate (0, 0, 50 * Time.deltaTime); 
 			elliot.transform.Rotate (0, 0, 50 * Time.deltaTime);
 			Camera.main.transform.Rotate (0, 0, 50 * Time.deltaTime);
 			yield return null;
@@ -284,6 +293,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		heart.transform.eulerAngles = new Vector3(0, 0, nextCameraRotAngle);
 		elliot.transform.eulerAngles = new Vector3(0, 0, nextCameraRotAngle);
 		Camera.main.transform.eulerAngles = new Vector3(0, 0, nextCameraRotAngle);
+		isCameraRotating = false;
 	}
 
 	IEnumerator MoveObject(GameObject obj, Vector2 target, float speed)
@@ -305,6 +315,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 	{
 		BattleController.instance.isLevelReadyToStart = false;
 		isPlayingEndEvent = true;
+		Time.timeScale = 1;
 
 		// Elliot moves into camera view
 		isMovingElliot = true;
