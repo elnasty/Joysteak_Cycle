@@ -282,7 +282,7 @@ public class Item0_Seq0_ScriptedEvents : MonoBehaviour
 		isCameraRotating = true;
 		while (!areAllProjectilesDisabled()) yield return null; // Rotate camera after all rojectiles leave the screen
 		MoveRingShields (); // To move ringShields back into camera's view during camera rotation
-		while (Camera.main.transform.eulerAngles.z < nextCameraRotAngle - 1) 
+		while (Camera.main.transform.eulerAngles.z < nextCameraRotAngle - 1 * Time.timeScale) 
 		{
 			heart.transform.Rotate (0, 0, 50 * Time.deltaTime); 
 			elliot.transform.Rotate (0, 0, 50 * Time.deltaTime);
