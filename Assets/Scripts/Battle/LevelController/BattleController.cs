@@ -52,6 +52,8 @@ public class BattleController : MonoBehaviour {
 			pools.Add(new List<GameObject>());
 
 		ripple = cameraObj.GetComponent<RippleEffect> ();
+
+		Cursor.visible = false;
 	}
 
 	void Start ()

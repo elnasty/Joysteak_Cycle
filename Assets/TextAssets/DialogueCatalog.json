@@ -3,18 +3,13 @@
     "dialogueLines": [
       {
         "character": "Casey",
-        "dialogue": "I wonder what Elliot would say...",
+        "dialogue": "It's broken...",
         "expression": 0
       },
       {
         "character": "Casey",
-        "dialogue": "I don't want to deal with this right now.",
+        "dialogue": "... but does it even matter anymore...",
         "expression": 2
-      },
-      {
-        "character": "Casey",
-        "dialogue": "No!",
-        "expression": 3
       }
     ]
   },
